@@ -20,7 +20,7 @@ for m in soup.find_all('td', class_ = 'text-left'):
 #remove the first 2 char in each link
 for i in range(len(links)):
     links[i] = links[i][2:]
-#for each link in the list, scrape the page
+#for each link in the list, scrape the page building a match
 for link in links:
     URL = "https://gol.gg"+link;
     source = requests.get(URL, headers = {'User-agent': 'your bot 0.1'}).text
