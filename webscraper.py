@@ -1,17 +1,12 @@
 # Adding libraries needed
-from re import M
-import pandas as pd
-import numpy as np
 from bs4 import BeautifulSoup
 import requests
 
-
-
- 
 #link to the page
 source = requests.get('https://gol.gg/tournament/tournament-matchlist/LEC%20Spring%20Playoffs%202022/' , headers = {'User-agent': 'your bot 0.1'}).text
 #souping the page
 soup = BeautifulSoup(source, 'lxml')
+
 #make a list of all the match links
 links = []
 for m in soup.find_all('td', class_ = 'text-left'):
