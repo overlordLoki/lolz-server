@@ -1,6 +1,6 @@
-# Adding libraries needed
 from bs4 import BeautifulSoup
 import requests
+import scrapGame
     
 def scrapeTourn(url):
     #link to the page
