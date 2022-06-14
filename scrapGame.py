@@ -1,4 +1,6 @@
+from cmath import e
 from re import I, T
+from tkinter import W
 from bs4 import BeautifulSoup
 import requests
 
@@ -48,7 +50,8 @@ def scrapeGame(link, num_in_tournament):
     #game time
     #get game time "col-6 text-center"
     gametime = elements[0].find('div', class_ = 'col-6 text-center').text.split('\n')[1]
-    
+    gametime = gametime.split(':')
+    gametime = int(gametime[0])*60 + int(gametime[1])
     #.............................................................
     #game date
     dateAndWeek = soup.find('div', class_ = 'col-12 col-sm-5 text-right').text.split(' ')
@@ -79,7 +82,15 @@ def scrapeGame(link, num_in_tournament):
     if(outcome == ' WIN'):
         redWin = True
     
+    winner = ''
+    if(blueWin):
+        Winner = blueTeamName
+    elif(redWin):
+        Winner = redTeamName
     #.............................................................
+    #game name
+    gameName = blueTeamName + " vs " + redTeamName
+    #...............................................................
     #region and tourmament
     regionAndTourmament = soup.find('div', class_ = 'col-12 col-sm-7').text.split(' ')
     region = regionAndTourmament[0][1:5]
@@ -110,6 +121,8 @@ def scrapeGame(link, num_in_tournament):
         blueFB = True
     #blue dragons
     blueDragons = blueTeamStats[2].find('span', class_ = 'score-box blue_line').text.split(' ')[1]
+    if(blueDragons == ''):
+        blueDragons = 0
     #blue Barons
     blueBarons = blueTeamStats[3].find('span', class_ = 'score-box blue_line').text
     #blue Gold
@@ -135,6 +148,8 @@ def scrapeGame(link, num_in_tournament):
         redFT = True
     #number of dragons
     redDragons = redTeamScores[2].find('span', class_ = 'score-box red_line').text.split(' ')[1]
+    if(redDragons == ''):
+        redDragons = 0
     #number of barons
     redBarons = redTeamScores[3].find('span', class_ = 'score-box red_line').text
     #number of gold
@@ -147,13 +162,31 @@ def scrapeGame(link, num_in_tournament):
     bluePlayers = []
     allPlayers =tables[0].find_all('a', class_ = 'link-blanc')
     for player in allPlayers:
-        bluePlayers += [player.text]
+        bluePlayers.append(player.text)
 
     #get red team players
     redPlayers = []
     allPlayers =tables[1].find_all('a', class_ = 'link-blanc')
     for player in allPlayers:
-        redPlayers += player.text
+        redPlayers.append(player.text)
+        
+    #..............................................................................................................
+    #totals
+    total_kills = int(blueKills) + int(redKills)
+    total_towers = int(blueTowers) + int(redTowers)
+    total_dragons = int(blueDragons) + int(redDragons)
+    total_barons = int(blueBarons) + int(redBarons)
+    total_gold = float(blueGold) + float(redGold)
+    firstblood_team = ''
+    if(blueFB):
+        firstblood_team = blueTeamName
+    elif(redFB):
+        firstblood_team = redTeamName
+    firsttower_team = ''
+    if(blueFT):
+        firsttower_team = blueTeamName
+    elif(redFT):
+        firsttower_team = redTeamName
     #............................................................................................................
     #game id
     id = idMaker(tourmament,num_in_tournament)
@@ -200,9 +233,9 @@ def scrapeGame(link, num_in_tournament):
                 #get team (blue or red)
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
                 if(teamflag != None and 'blue' in teamflag.get('src')):
-                    fd_team = blue
+                    fd_team = 'blue'
                 else:
-                    fd_team = red
+                    fd_team = 'red'
                 break  
         #find first rift herald time
         for row in rows:
@@ -213,9 +246,9 @@ def scrapeGame(link, num_in_tournament):
                 #get team (blue or red)
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
                 if(teamflag != None and 'blue' in teamflag.get('src')):
-                    fr_team = blue
+                    fr_team = 'blue'
                 else:
-                    fr_team = red
+                    fr_team = 'red'
                 break
         #find first baron time
         for row in rows:
@@ -225,17 +258,24 @@ def scrapeGame(link, num_in_tournament):
                 fbr_time = f[0].text
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
                 if(teamflag != None and 'blue' in teamflag.get('src')):
-                    fbr_team = blue
+                    fbr_team = 'blue'
                 else:
-                    fbr_team = red
+                    fbr_team = 'red'
     #............................................................................................................
     #make game [] and return it (to be added to df)
-    GAME = [id,tourmament,num_in_tournament,blueTeam,redTeam,blueKills,redKills,blueTowers,
-            redTowers,blueDragons,redDragons,blueBarons,redBarons,blueGold,redGold,blueFB,redFB,
-            fb_time,ft_time,fd_time,fd_team,fr_time,fr_team,fbr_time,fbr_team,bluePlayers,redPlayers]
+    # id, game name, tourmament , blue team name, red team name, date, week, winner, blue kills, red kills, total kills, blue towers, red towers, total towers,
+    # blue dragons, red dragons, total dragons, blue barons, red barons, total barons, blue gold, red gold, total gold,
+    # first blood team, first blood time, first tower team, first tower time, first dragon team, first dragon time, first rift herald team, first rift herald time,
+    # first baron team , first baron time ,blue players, red players, game time.
+    GAME = [int(id), gameName, tourmament, blueTeamName, redTeamName, date, week, winner, 
+            int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
+            int(blueDragons) , int(redDragons), int(total_dragons), int(blueBarons), int(redBarons), int(total_barons),
+            float(blueGold), float(redGold), float(total_gold),
+            firstblood_team, fb_time, firsttower_team, ft_time, fd_team, fd_time, fr_team, fr_time, fbr_team, fbr_time,
+            bluePlayers,redPlayers,gametime]
     return GAME
 
 
 
 #scrapeGame('/game/stats/40253/page-game/',1)
-scrapeGame('/game/stats/39726/page-game/',1)
+gametoprint = scrapeGame('/game/stats/39726/page-game/',1)
