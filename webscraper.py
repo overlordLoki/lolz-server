@@ -32,7 +32,7 @@ def scrapeTourn(url):
             'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
             'Blue gold', 'Red gold', 'Total gold', 'First blood team', 'First blood time', 'First tower team',
             'First tower time', 'First dragon team', 'First dragon time', 'First rift herald team', 'First rift herald time',
-            'First baron team', 'First baron time', 'Game time']
+            'First baron team', 'First baron time', 'Game time','Blue players', 'Red players']
     #create the dataframe
     df = pd.DataFrame(columns = cols)
     #for each link in the list, scrape the page building a match
