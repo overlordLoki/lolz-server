@@ -1,6 +1,4 @@
-from cmath import e
-from re import I, T
-from tkinter import W
+import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 
@@ -203,8 +201,8 @@ def scrapeGame(link, num_in_tournament):
     fd_team = ''
     fr_time = 0
     fr_team = ''
-    fbr_time = 0
-    fbr_team = ''
+    fbaron_time = 0
+    fbaron_team = ''
     #if table is not None
     if(table != None):
         #get all rows
@@ -255,25 +253,32 @@ def scrapeGame(link, num_in_tournament):
             f = row.find_all('td')
             ff = f[4].find('img', src = "../_img/baron-icon.png")
             if(ff != None):
-                fbr_time = f[0].text
+                fbaron_time = f[0].text
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
                 if(teamflag != None and 'blue' in teamflag.get('src')):
-                    fbr_team = 'blue'
+                    fbaron_team = 'blue'
                 else:
-                    fbr_team = 'red'
+                    fbaron_team = 'red'
     #............................................................................................................
     #make game [] and return it (to be added to df)
     # id, game name, tourmament , blue team name, red team name, date, week, winner, blue kills, red kills, total kills, blue towers, red towers, total towers,
     # blue dragons, red dragons, total dragons, blue barons, red barons, total barons, blue gold, red gold, total gold,
     # first blood team, first blood time, first tower team, first tower time, first dragon team, first dragon time, first rift herald team, first rift herald time,
     # first baron team , first baron time ,blue players, red players, game time.
+    cols = ['ID', 'Game Name', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
+            'Blue kills', 'Red kills', 'Total kills', 'Blue towers', 'Red towers', 'Total towers',
+            'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
+            'Blue gold', 'Red gold', 'Total gold', 'First blood team', 'First blood time', 'First tower team',
+            'First tower time', 'First dragon team', 'First dragon time', 'First rift herald team', 'First rift herald time',
+            'First baron team', 'First baron time', 'Game time']    
     GAME = [int(id), gameName, tourmament, blueTeamName, redTeamName, date, week, winner, 
             int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
             int(blueDragons) , int(redDragons), int(total_dragons), int(blueBarons), int(redBarons), int(total_barons),
             float(blueGold), float(redGold), float(total_gold),
-            firstblood_team, fb_time, firsttower_team, ft_time, fd_team, fd_time, fr_team, fr_time, fbr_team, fbr_time,
-            bluePlayers,redPlayers,gametime]
-    return GAME
+            firstblood_team, fb_time, firsttower_team, ft_time, fd_team, fd_time, fr_team, fr_time, fbaron_team, fbaron_time,
+            gametime]
+    gamedf = pd.DataFrame([GAME], columns = cols)
+    return gamedf
 
 
 
