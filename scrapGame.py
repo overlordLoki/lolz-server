@@ -69,7 +69,7 @@ def scrapeGame(link, num_in_tournament):
     outcome = blueteambanner.split('-')[1]
     blueTeamName = blueteambanner.split('-')[0].replace('\n','')
     blueWin = False
-    if(outcome == ' WIN'):
+    if(outcome.__contains__('WIN')):
         blueWin = True
     
     #red team name and win/loss
@@ -77,14 +77,13 @@ def scrapeGame(link, num_in_tournament):
     outcome = redteambanner.split('-')[1]
     redTeamName = redteambanner.split('-')[0].replace('\n','')
     redWin = False
-    if(outcome == ' WIN'):
+    if(outcome.__contains__('WIN')):
         redWin = True
-    
     winner = ''
     if(blueWin):
-        Winner = blueTeamName
+        winner = 'blue'
     elif(redWin):
-        Winner = redTeamName
+        winner = 'red'
     #.............................................................
     #game name
     gameName = blueTeamName + " vs " + redTeamName
@@ -251,7 +250,7 @@ def scrapeGame(link, num_in_tournament):
         #find first baron time
         for row in rows:
             f = row.find_all('td')
-            ff = f[4].find('img', src = "../_img/baron-icon.png")
+            ff = f[4].find('img', src = "../_img/nashor-icon.png")
             if(ff != None):
                 fbaron_time = f[0].text
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
@@ -259,6 +258,7 @@ def scrapeGame(link, num_in_tournament):
                     fbaron_team = 'blue'
                 else:
                     fbaron_team = 'red'
+                break
     #............................................................................................................
     #make game [] and return it (to be added to df)
     # id, game name, tourmament , blue team name, red team name, date, week, winner, blue kills, red kills, total kills, blue towers, red towers, total towers,
@@ -270,13 +270,13 @@ def scrapeGame(link, num_in_tournament):
             'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
             'Blue gold', 'Red gold', 'Total gold', 'First blood team', 'First blood time', 'First tower team',
             'First tower time', 'First dragon team', 'First dragon time', 'First rift herald team', 'First rift herald time',
-            'First baron team', 'First baron time', 'Game time']    
+            'First baron team', 'First baron time', 'Game time','Blue players', 'Red players']    
     GAME = [int(id), gameName, tourmament, blueTeamName, redTeamName, date, week, winner, 
             int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
             int(blueDragons) , int(redDragons), int(total_dragons), int(blueBarons), int(redBarons), int(total_barons),
             float(blueGold), float(redGold), float(total_gold),
             firstblood_team, fb_time, firsttower_team, ft_time, fd_team, fd_time, fr_team, fr_time, fbaron_team, fbaron_time,
-            gametime]
+            gametime, bluePlayers, redPlayers]
     gamedf = pd.DataFrame([GAME], columns = cols)
     return gamedf
 
@@ -284,3 +284,4 @@ def scrapeGame(link, num_in_tournament):
 
 #scrapeGame('/game/stats/40253/page-game/',1)
 gametoprint = scrapeGame('/game/stats/39726/page-game/',1)
+gametoprint.to_csv('game.csv')
