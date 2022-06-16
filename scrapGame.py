@@ -212,6 +212,8 @@ def scrapeGame(link, num_in_tournament):
             ff = f[4].find('img', src = "../_img/kill-icon.png")
             if(ff != None):
                 fb_time = f[0].text
+                #fb time to seconds
+                fb_time = int(fb_time.split(':')[0]) * 60 + int(fb_time.split(':')[1])
                 break
         #find first tower time
         for row in rows:
@@ -219,6 +221,8 @@ def scrapeGame(link, num_in_tournament):
             ff = f[4].find('img', src = "../_img/tower-icon.png")
             if(ff != None):
                 ft_time = f[0].text
+                #ft time to seconds
+                ft_time = int(ft_time.split(':')[0]) * 60 + int(ft_time.split(':')[1])
                 break
         #find first dragon time
         for row in rows:
@@ -227,6 +231,8 @@ def scrapeGame(link, num_in_tournament):
             #print true if src contains 'dragon'
             if(ff != None and 'dragon' in ff.get('src')):
                 fd_time = f[0].text
+                #fd time to seconds
+                fd_time = int(fd_time.split(':')[0]) * 60 + int(fd_time.split(':')[1])
                 #get team (blue or red)
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
                 if(teamflag != None and 'blue' in teamflag.get('src')):
@@ -240,6 +246,8 @@ def scrapeGame(link, num_in_tournament):
             ff = f[4].find('img', src = "../_img/herald-icon.png")
             if(ff != None):
                 fr_time = f[0].text
+                #fr time to seconds
+                fr_time = int(fr_time.split(':')[0]) * 60 + int(fr_time.split(':')[1])
                 #get team (blue or red)
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
                 if(teamflag != None and 'blue' in teamflag.get('src')):
@@ -253,6 +261,8 @@ def scrapeGame(link, num_in_tournament):
             ff = f[4].find('img', src = "../_img/nashor-icon.png")
             if(ff != None):
                 fbaron_time = f[0].text
+                #fbaron time to seconds
+                fbaron_time = int(fbaron_time.split(':')[0]) * 60 + int(fbaron_time.split(':')[1])
                 teamflag = f[1].find('img', class_ = "champion_icon_light")
                 if(teamflag != None and 'blue' in teamflag.get('src')):
                     fbaron_team = 'blue'
@@ -275,8 +285,8 @@ def scrapeGame(link, num_in_tournament):
             int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
             int(blueDragons) , int(redDragons), int(total_dragons), int(blueBarons), int(redBarons), int(total_barons),
             float(blueGold), float(redGold), float(total_gold),
-            firstblood_team, fb_time, firsttower_team, ft_time, fd_team, fd_time, fr_team, fr_time, fbaron_team, fbaron_time,
-            gametime, bluePlayers, redPlayers]
+            firstblood_team, int(fb_time), firsttower_team, int(ft_time), fd_team, int(fd_time), fr_team, int(fr_time), fbaron_team,
+            int(fbaron_time),gametime, bluePlayers, redPlayers]
     gamedf = pd.DataFrame([GAME], columns = cols)
     return gamedf
 
