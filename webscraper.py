@@ -11,10 +11,8 @@ def scrapeTourn(url):
     #souping the page
     soup = BeautifulSoup(source, 'lxml')
     #make a list of all the match links
-    links = []
-    for m in soup.find_all('td', class_ = 'text-left'):
-        #add the href of the link to the list
-        links.append(m.find('a').get('href'))
+    links = [m.find('a').get('href') for m in soup.find_all('td', class_='text-left')]
+
     #remove the first 2 char in each link
     for i in range(len(links)):
         links[i] = links[i][2:]
@@ -27,7 +25,7 @@ def scrapeTourn(url):
     # blue dragons, red dragons, total dragons, blue barons, red barons, total barons, blue gold, red gold, total gold,
     # first blood team, first blood time, first tower team, first tower time, first dragon team, first dragon time, first rift herald team, first rift herald time,
     # first baron team , first baron time ,blue players, red players, game time.
-    cols = ['ID', 'Game Name', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
+    cols = ['ID', 'Game Name','Region', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
             'Blue kills', 'Red kills', 'Total kills', 'Blue towers', 'Red towers', 'Total towers',
             'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
             'Blue gold', 'Red gold', 'Total gold', 'First blood team', 'First blood time', 'First tower team',
@@ -48,7 +46,7 @@ def scrapeTourn(url):
             m = m.get('href')
             m = m[2:]
             gamelinks.append(m)
-        
+
         for game_link in gamelinks:
             game = scrapGame.scrapeGame(game_link,num_in_tourn)
             num_in_tourn += 1
