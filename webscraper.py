@@ -2,8 +2,6 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import requests
 import scrapGame
-
-
     
 def scrapeTourn(url):
     #link to the page
@@ -33,6 +31,10 @@ def scrapeTourn(url):
             'First baron team', 'First baron time', 'Game time','Blue players', 'Red players']
     #create the dataframe
     df = pd.DataFrame(columns = cols)
+    df = scrapMatch(links, num_in_tourn, df)
+    return df
+
+def scrapMatch(links, num_in_tourn, df):
     #for each link in the list, scrape the page building a match
     for link in links:
         URL = "https://gol.gg"+link;
