@@ -160,6 +160,7 @@ def scrapeGame(link, num_in_tournament):
     #firstblood time ,first tower time, first dragon time and first rift herald time
     fb_time = 0
     ft_time = 0
+    firsttower_team = ''
     fd_time = 0
     fd_team = ''
     fr_time = 0
@@ -171,12 +172,12 @@ def scrapeGame(link, num_in_tournament):
         #get all rows
         rows = table.find_all('tr')[1:-1]
         fb_time = firstblood(rows)
-        ft_time = towers(rows)
+        ft_time,firsttower_team = towers(rows)
         fd_time, fd_team = Dragons(rows)  
         fr_time, fr_team = riftH(rows)
         fbaron_time, fbaron_team = barons(rows)
     #............................................................................................................
-    #make game [] and return it (to be added to df)
+    #make game and return it (to be added to df)
     cols = ['ID', 'Game Name','Region', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
             'Blue kills', 'Red kills', 'Total kills', 'Blue towers', 'Red towers', 'Total towers',
             'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
@@ -220,22 +221,27 @@ def towers(rows):
         ff = f[4].find('img', src = "../_img/tower-icon.png")
         if(ff != None):
             ft_time = f[0].text
-                #ft time to seconds
+            #ft time to seconds
             ft_time = int(ft_time.split(':')[0]) * 60 + int(ft_time.split(':')[1])
+            teamflag = f[1].find('img', class_ = "champion_icon_light")
+            if(teamflag != None and 'blue' in teamflag.get('src')):
+                firsttower_team = 'blue'
+            else:
+                firsttower_team = 'red'
             break
-    return ft_time
+    return ft_time,firsttower_team
 
 def Dragons(rows):
     #find first dragon time
     for row in rows:
         f = row.find_all('td')
         ff = f[4].find('img', class_ = "champion_icon_light")
-            #print true if src contains 'dragon'
-        if(ff != None and 'dragon' in ff.get('src')):
+        #true if src contains 'dragon'
+        if(ff != None and ('dragon' or 'drake' in ff.get('src'))):
             fd_time = f[0].text
-                #fd time to seconds
+            #fd time to seconds
             fd_time = int(fd_time.split(':')[0]) * 60 + int(fd_time.split(':')[1])
-                #get team (blue or red)
+            #get team (blue or red)
             teamflag = f[1].find('img', class_ = "champion_icon_light")
             if(teamflag != None and 'blue' in teamflag.get('src')):
                 fd_team = 'blue'
@@ -277,6 +283,9 @@ def barons(rows):
             else:
                 fbaron_team = 'red'
             break
+        else:
+            fbaron_time = 0
+            fbaron_team = 'none'
     return fbaron_time,fbaron_team
 
 def idMaker(tourmament_name, number_in_tourmament):
@@ -309,5 +318,5 @@ def idMaker(tourmament_name, number_in_tourmament):
 
 
 #for testing purposes
-gametoprint = scrapeGame('/game/stats/39726/page-game/',1)
-gametoprint.to_csv('game.csv')
+gametoprint = scrapeGame('/game/stats/38491/page-game/',1)
+#gametoprint.to_csv('game.csv')

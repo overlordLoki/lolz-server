@@ -18,6 +18,7 @@ def scrapeTourn(url):
     links = links[::-1]
     #number of games currently in the tournament
     num_in_tourn = 1
+    num_of_match = 1
     #dataframe to store the games
     # id, game name, tourmament , blue team name, red team name, date, week, winner, blue kills, red kills, total kills, blue towers, red towers, total towers,
     # blue dragons, red dragons, total dragons, blue barons, red barons, total barons, blue gold, red gold, total gold,
