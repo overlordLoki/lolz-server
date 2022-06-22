@@ -308,6 +308,8 @@ def idMaker(tourmament_name, number_in_tourmament):
         tNum = 6;
     #number for the year
     yearNum = tourmament_name.split(' ')[-1][-2:]
+    if(yearNum == 'R)'):
+        yearNum = tourmament_name.split(' ')[1]
     #build id and return it
     s = str(number_in_tourmament) + str(tNum) + str(regNum) + str(yearNum)
     return int(s)
@@ -315,5 +317,5 @@ def idMaker(tourmament_name, number_in_tourmament):
 
 
 #for testing purposes
-#gametoprint = scrapeGame('/game/stats/35847/page-game/',1,1,'OMG vs TT')
-#gametoprint.to_csv('game.csv')
+# gametoprint = scrapeGame('/game/stats/35847/page-game/',1,1,'OMG vs TT')
+# gametoprint.to_csv('game.csv')

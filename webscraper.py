@@ -65,5 +65,5 @@ def scrapMatchs(links, num_in_tourn, df):
     return df
     
 
-#df_to_write = scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LEC%20Spring%20Playoffs%202022/')
+#df_to_write = scrapeTourn('https://gol.gg/tournament/tournament-matchlist/MSI%202022/')
 #df_to_write.to_csv(df_to_write.iloc[0]['Tournament']+'.csv')
