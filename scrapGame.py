@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 
 
-def scrapeGame(link, num_in_tournament):
+def scrapeGame(link, num_in_tournament,num_of_match,matchName):
     URL = "https://gol.gg"+link;
     source = requests.get(URL, headers = {'User-agent': 'your bot 0.1'}).text
     soup = BeautifulSoup(source, 'lxml')
@@ -26,12 +26,12 @@ def scrapeGame(link, num_in_tournament):
     week = dateAndWeek[1]
     #remove first 5 char in week and last char in week
     week = week[5:-1]
-    if(isinstance(week, int)):
+    #try make week int
+    try:
         week = int(week)
-    else:
+    except:
         week = 0
-    week = int(week)
-    
+        week = int(week)
     #................................................................
     #blue team name and win/loss
     blueteambanner  = elem.find('div',class_ ='col-12 blue-line-header').text
@@ -81,7 +81,7 @@ def scrapeGame(link, num_in_tournament):
     if(FT != None):
         blueFB = True
     #blue dragons
-    blueDragons = blueTeamStats[2].find('span', class_ = 'score-box blue_line').text.split(' ')[1]
+    blueDragons = blueTeamStats[2].find('span', class_ = 'score-box blue_line').text.split(' ')[0]
     if(blueDragons == ''):
         blueDragons = 0
     #blue Barons
@@ -108,7 +108,7 @@ def scrapeGame(link, num_in_tournament):
     if(FT != None):
         redFT = True
     #number of dragons
-    redDragons = redTeamScores[2].find('span', class_ = 'score-box red_line').text.split(' ')[1]
+    redDragons = redTeamScores[2].find('span', class_ = 'score-box red_line').text.split(' ')[0]
     if(redDragons == ''):
         redDragons = 0
     #number of barons
@@ -120,16 +120,16 @@ def scrapeGame(link, num_in_tournament):
     #get tables 'playersInfosLine footable toggle-square-filled'
     tables = soup.find_all('table', class_ = 'playersInfosLine footable toggle-square-filled')
     #get blue team players
-    bluePlayers = []
+    bluePlayers = ''
     allPlayers =tables[0].find_all('a', class_ = 'link-blanc')
     for player in allPlayers:
-        bluePlayers.append(player.text)
+        bluePlayers += player.text + ','
 
     #get red team players
-    redPlayers = []
+    redPlayers = ''
     allPlayers =tables[1].find_all('a', class_ = 'link-blanc')
     for player in allPlayers:
-        redPlayers.append(player.text)
+        redPlayers += player.text + ','
         
     #..............................................................................................................
     #totals
@@ -140,14 +140,14 @@ def scrapeGame(link, num_in_tournament):
     total_gold = float(blueGold) + float(redGold)
     firstblood_team = ''
     if(blueFB):
-        firstblood_team = blueTeamName
+        firstblood_team = 'blue'
     elif(redFB):
-        firstblood_team = redTeamName
+        firstblood_team = 'red'
     firsttower_team = ''
     if(blueFT):
-        firsttower_team = blueTeamName
+        firsttower_team = 'blue'
     elif(redFT):
-        firsttower_team = redTeamName
+        firsttower_team = 'red'
     #............................................................................................................
     #game id
     id = idMaker(tourmament,num_in_tournament)
@@ -178,13 +178,13 @@ def scrapeGame(link, num_in_tournament):
         fbaron_time, fbaron_team = barons(rows)
     #............................................................................................................
     #make game and return it (to be added to df)
-    cols = ['ID', 'Game Name','Region', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
+    cols = ['ID', 'Game Name','Match Name','Num in Match','Region', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
             'Blue kills', 'Red kills', 'Total kills', 'Blue towers', 'Red towers', 'Total towers',
             'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
             'Blue gold', 'Red gold', 'Total gold', 'First blood team', 'First blood time', 'First tower team',
             'First tower time', 'First dragon team', 'First dragon time', 'First rift herald team', 'First rift herald time',
             'First baron team', 'First baron time', 'Game time','Blue players', 'Red players']    
-    GAME = [int(id), gameName,region, tourmament, blueTeamName, redTeamName, date, week, winner, 
+    GAME = [int(id), gameName,matchName+" "+str(week),int(num_of_match),region, tourmament, blueTeamName, redTeamName, date, week, winner, 
             int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
             int(blueDragons) , int(redDragons), int(total_dragons), int(blueBarons), int(redBarons), int(total_barons),
             float(blueGold), float(redGold), float(total_gold),
@@ -273,19 +273,16 @@ def barons(rows):
     for row in rows:
         f = row.find_all('td')
         ff = f[4].find('img', src = "../_img/nashor-icon.png")
-        if(ff != None):
+        if ff is None:
+            fbaron_time = 0
+            fbaron_team = 'none'
+        else:
             fbaron_time = f[0].text
             #fbaron time to seconds
             fbaron_time = int(fbaron_time.split(':')[0]) * 60 + int(fbaron_time.split(':')[1])
             teamflag = f[1].find('img', class_ = "champion_icon_light")
-            if(teamflag != None and 'blue' in teamflag.get('src')):
-                fbaron_team = 'blue'
-            else:
-                fbaron_team = 'red'
+            fbaron_team = 'blue' if (teamflag != None and 'blue' in teamflag.get('src')) else 'red'
             break
-        else:
-            fbaron_time = 0
-            fbaron_team = 'none'
     return fbaron_time,fbaron_team
 
 def idMaker(tourmament_name, number_in_tourmament):
@@ -318,5 +315,5 @@ def idMaker(tourmament_name, number_in_tourmament):
 
 
 #for testing purposes
-gametoprint = scrapeGame('/game/stats/38491/page-game/',1)
+#gametoprint = scrapeGame('/game/stats/35847/page-game/',1,1,'OMG vs TT')
 #gametoprint.to_csv('game.csv')
