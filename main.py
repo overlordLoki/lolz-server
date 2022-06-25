@@ -1,8 +1,3 @@
-# sourcery skip: avoid-builtin-shadow
-import re
-from unittest import result
-from click import command
-from matplotlib.pyplot import get
 import pandas as pd
 from sqlalchemy import create_engine
 import webscraper as ws
