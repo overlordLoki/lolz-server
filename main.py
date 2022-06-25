@@ -1,46 +1,45 @@
+# sourcery skip: avoid-builtin-shadow
+import re
+from unittest import result
 from click import command
+from matplotlib.pyplot import get
 import pandas as pd
 from sqlalchemy import create_engine
 import webscraper as ws
 
 #load in the csv files
-# lck_df = pd.read_csv('data/LCK Spring 2022.csv')
-# lcs_df = pd.read_csv('data/LCS Spring 2022.csv')
-# lpl_df = pd.read_csv('data/LPL Spring 2022.csv')
-# lec_df = pd.read_csv('data/LEC Spring 2022.csv')
-# lec_playoffs_df = pd.read_csv('data/LEC Spring Playoffs 2022.csv')
-# lpl_playoffs_df = pd.read_csv('data/LPL Spring Playoffs 2022.csv')
-# lcs_playoffs_df = pd.read_csv('data/LCS Spring Playoffs 2022.csv')
-# lck_playoffs_df = pd.read_csv('data/LCK Spring Playoffs 2022.csv')
-# msi_df = pd.read_csv('data/MSI 2022.csv')
+# lck_df = pd.read_csv('data/LCK_Spring_2022.csv')
+# lcs_df = pd.read_csv('data/LCS_Spring_2022.csv')
+# lpl_df = pd.read_csv('data/LPL_Spring_2022.csv')
+# lec_df = pd.read_csv('data/LEC_Spring_2022.csv')
+# lec_playoffs_df = pd.read_csv('data/LEC_Spring_Playoffs_2022.csv')
+# lpl_playoffs_df = pd.read_csv('data/LPL_Spring_Playoffs_2022.csv')
+# lcs_playoffs_df = pd.read_csv('data/LCS_Spring_Playoffs_2022.csv')
+# lck_playoffs_df = pd.read_csv('data/LCK_Spring_Playoffs_2022.csv')
+# msi_df = pd.read_csv('data/MSI_2022.csv')
+# #add them a list
+# list = [lck_df, lcs_df, lpl_df, lec_df, lec_playoffs_df, lpl_playoffs_df, lcs_playoffs_df, lck_playoffs_df, msi_df]
 #create the engine
 engine = create_engine('sqlite:///lolz.db', echo=False)
-#write the df to the sql as table 'LCK_Spring_2022'
-# lck_df.to_sql('LCK_Spring_2022', engine, if_exists='replace', index=False)
-# lpl_df.to_sql('LPL_Spring_2022', engine, if_exists='replace', index=False)
-# lpl_playoffs_df.to_sql('LPL_Spring_Playoffs_2022', engine, if_exists='replace', index=False)
-# lec_df.to_sql('LEC_Spring_2022', engine, if_exists='replace', index=False)
-# lec_playoffs_df.to_sql('LEC_Spring_Playoffs_2022', engine, if_exists='replace', index=False)
-# lcs_df.to_sql('LCS_Spring_2022', engine, if_exists='replace', index=False)
-# lcs_playoffs_df.to_sql('LCS_Spring_Playoffs_2022', engine, if_exists='replace', index=False)
-# lck_playoffs_df.to_sql('LCK_Spring_Playoffs_2022', engine, if_exists='replace', index=False)
-# msi_df.to_sql('MSI_2022', engine, if_exists='replace', index=False)
 
-# def makeCSVs():
-#     linkList = ['https://gol.gg/tournament/tournament-matchlist/LCK%20Spring%202022/',
-#             'https://gol.gg/tournament/tournament-matchlist/LCK%20Spring%20Playoffs%202022/',
-#             'https://gol.gg/tournament/tournament-matchlist/LEC%20Spring%202022/',
-#             'https://gol.gg/tournament/tournament-matchlist/LEC%20Spring%20Playoffs%202022/',
-#             'https://gol.gg/tournament/tournament-matchlist/LPL%20Spring%202022/',
-#             'https://gol.gg/tournament/tournament-matchlist/LPL%20Spring%20Playoffs%202022/',
-#             'https://gol.gg/tournament/tournament-matchlist/LCS%20Spring%202022/',
-#             'https://gol.gg/tournament/tournament-matchlist/LCS%20Spring%20Playoffs%202022/'
-#             ]
-#     for link in linkList:
-#         #make the df by webscraping the tournament
-#         df = ws.scrapeTourn(link)
-#         #get the tournament name from df
-#         name = df.iloc[0]['Tournament']
-#         print(name+' scraped')
-#         df.to_csv(name + '.csv')
-        
+def getLastGames(num, team, tournament):
+    return pd.read_sql_query("SELECT * FROM " 
+                             + "'" + tournament + "'" +
+                            " WHERE Game_Name like " "'" + team + "'"
+                             + " LIMIT " + str(num), engine)
+
+def getTable(tournament):
+    return pd.read_sql_query("SELECT * FROM " + tournament, engine)
+
+def makeCSVs():
+    linkList = []
+    for link in linkList:
+        #make the df by webscraping the tournament
+        df = ws.scrapeTourn(link)
+        #get the tournament name from df
+        name = df.iloc[0]['Tournament']
+        print(name+' scraped')
+        df.to_csv(name + '.csv')
+
+# df = getLastGames(1, 'T1', 'LCK Spring 2022')
+# print(df)

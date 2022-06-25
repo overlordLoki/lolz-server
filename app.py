@@ -17,5 +17,10 @@ def scrape():
     thing = {"message": "Scrape successful"}
     return jsonify(thing)
 
+@app.route("/api/v1/getLastGames/<int:num>/<string:team>") # http://localhost:5000/api/v1/getLastGames/<int:num>/<string:team>
+def getLastGames(num, team):
+    teamsRegon = ''
+    return jsonify(teamsRegon)
+
 if __name__ == "__main__":
     app.run(debug=True)
