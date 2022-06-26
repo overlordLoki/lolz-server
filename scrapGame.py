@@ -1,6 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
+from sqlalchemy import null
 
 
 def scrapeGame(link, num_in_tournament,num_of_match,matchName):
@@ -85,7 +86,11 @@ def scrapeGame(link, num_in_tournament,num_of_match,matchName):
     if(blueDragons == ''):
         blueDragons = 0
     #blue Barons
-    blueBarons = blueTeamStats[3].find('span', class_ = 'score-box blue_line').text
+    if(blueTeamStats[3].find('span', class_ = 'score-box blue_line') != None):
+        blueBarons = blueTeamStats[3].find('span', class_ = 'score-box blue_line').text
+    else:
+        blueBarons = 1
+    #blueBarons = blueTeamStats[3].find('span', class_ = 'score-box blue_line').text
     #blue Gold
     blueGold = blueTeamStats[4].find('span', class_ = 'score-box blue_line').text.split('k')[0].split(' ')[1]
     
@@ -112,7 +117,10 @@ def scrapeGame(link, num_in_tournament,num_of_match,matchName):
     if(redDragons == ''):
         redDragons = 0
     #number of barons
-    redBarons = redTeamScores[3].find('span', class_ = 'score-box red_line').text
+    if(redTeamScores[3].find('span', class_ = 'score-box red_line') != None):
+        redBarons = redTeamScores[3].find('span', class_ = 'score-box red_line').text
+    else:
+        redBarons = 1
     #number of gold
     redGold = redTeamScores[4].find('span', class_ = 'score-box red_line').text.split('k')[0].split(' ')[1]
     #......................................................................................................
@@ -178,15 +186,15 @@ def scrapeGame(link, num_in_tournament,num_of_match,matchName):
         fbaron_time, fbaron_team = barons(rows)
     #............................................................................................................
     #make game and return it (to be added to df)
-    cols = ['ID', 'Game Name','Match Name','Num in Match','Region', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
-            'Blue kills', 'Red kills', 'Total kills', 'Blue towers', 'Red towers', 'Total towers',
-            'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
-            'Blue gold', 'Red gold', 'Total gold', 'First blood team', 'First blood time', 'First tower team',
-            'First tower time', 'First dragon team', 'First dragon time', 'First rift herald team', 'First rift herald time',
-            'First baron team', 'First baron time', 'Game time','Blue players', 'Red players']    
+    cols = ['ID', 'Game_Name','Match_Name','Num_in_Match','Region', 'Tournament', 'Blue_Team_Name', 'Red_Team_Name', 'Date', 'Week', 'Winner', 
+            'Blue_kills', 'Red_kills', 'Total_kills', 'Blue_towers', 'Red_towers', 'Total_towers',
+            'Blue_dragons', 'Red_dragons', 'Total_dragons', 'Blue_barons', 'Red_barons', 'Total_barons',
+            'Blue_gold', 'Red_gold', 'Total_gold', 'First_blood_team', 'First_blood_time', 'First_tower_team',
+            'First_tower_time', 'First_dragon_team', 'First_dragon_time', 'First_rift_herald_team', 'First_rift_herald_time',
+            'First_baron_team', 'First_baron_time', 'Game_time','Blue_players', 'Red_players']    
     GAME = [int(id), gameName,matchName+" "+str(week),int(num_of_match),region, tourmament, blueTeamName, redTeamName, date, week, winner, 
             int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
-            int(blueDragons) , int(redDragons), int(total_dragons), int(blueBarons), int(redBarons), int(total_barons),
+            int(blueDragons) , int(redDragons), int(total_dragons), blueBarons, int(redBarons), int(total_barons),
             float(blueGold), float(redGold), float(total_gold),
             firstblood_team, int(fb_time), firsttower_team, int(ft_time), fd_team, int(fd_time), fr_team, int(fr_time), fbaron_team,
             int(fbaron_time),gametime, bluePlayers, redPlayers]
@@ -317,5 +325,5 @@ def idMaker(tourmament_name, number_in_tourmament):
 
 
 #for testing purposes
-# gametoprint = scrapeGame('/game/stats/35847/page-game/',1,1,'OMG vs TT')
+# gametoprint = scrapeGame('/game/stats/40616/page-game/',1,1,'OMG vs TT')
 # gametoprint.to_csv('game.csv')

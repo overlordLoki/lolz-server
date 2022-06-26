@@ -28,12 +28,12 @@ def scrapeTourn(url):  # sourcery skip: for-append-to-extend, list-comprehension
     # blue dragons, red dragons, total dragons, blue barons, red barons, total barons, blue gold, red gold, total gold,
     # first blood team, first blood time, first tower team, first tower time, first dragon team, first dragon time, first rift herald team, first rift herald time,
     # first baron team , first baron time ,blue players, red players, game time.
-    cols = ['ID', 'Game Name','Match Name','Num in Match','Region', 'Tournament', 'Blue Team Name', 'Red Team Name', 'Date', 'Week', 'Winner', 
-            'Blue kills', 'Red kills', 'Total kills', 'Blue towers', 'Red towers', 'Total towers',
-            'Blue dragons', 'Red dragons', 'Total dragons', 'Blue barons', 'Red barons', 'Total barons',
-            'Blue gold', 'Red gold', 'Total gold', 'First blood team', 'First blood time', 'First tower team',
-            'First tower time', 'First dragon team', 'First dragon time', 'First rift herald team', 'First rift herald time',
-            'First baron team', 'First baron time', 'Game time','Blue players', 'Red players']
+    cols = ['ID', 'Game_Name','Match_Name','Num_in_Match','Region', 'Tournament', 'Blue_Team_Name', 'Red_Team_Name', 'Date', 'Week', 'Winner', 
+            'Blue_kills', 'Red_kills', 'Total_kills', 'Blue_towers', 'Red_towers', 'Total_towers',
+            'Blue_dragons', 'Red_dragons', 'Total_dragons', 'Blue_barons', 'Red_barons', 'Total_barons',
+            'Blue_gold', 'Red_gold', 'Total_gold', 'First_blood_team', 'First_blood_time', 'First_tower_team',
+            'First_tower_time', 'First_dragon_team', 'First_dragon_time', 'First_rift_herald_team', 'First_rift_herald_time',
+            'First_baron_team', 'First_baron_time', 'Game_time','Blue_players', 'Red_players']    
     #create the dataframe
     df = pd.DataFrame(columns = cols)
     df = scrapMatchs(links, num_in_tourn, df)

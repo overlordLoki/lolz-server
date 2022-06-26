@@ -1,25 +1,14 @@
+from turtle import update
 import pandas as pd
 from sqlalchemy import create_engine
 import webscraper as ws
 
-#load in the csv files
-# lck_df = pd.read_csv('data/LCK_Spring_2022.csv')
-# lcs_df = pd.read_csv('data/LCS_Spring_2022.csv')
-# lpl_df = pd.read_csv('data/LPL_Spring_2022.csv')
-# lec_df = pd.read_csv('data/LEC_Spring_2022.csv')
-# lec_playoffs_df = pd.read_csv('data/LEC_Spring_Playoffs_2022.csv')
-# lpl_playoffs_df = pd.read_csv('data/LPL_Spring_Playoffs_2022.csv')
-# lcs_playoffs_df = pd.read_csv('data/LCS_Spring_Playoffs_2022.csv')
-# lck_playoffs_df = pd.read_csv('data/LCK_Spring_Playoffs_2022.csv')
-# msi_df = pd.read_csv('data/MSI_2022.csv')
-# #add them a list
-# list = [lck_df, lcs_df, lpl_df, lec_df, lec_playoffs_df, lpl_playoffs_df, lcs_playoffs_df, lck_playoffs_df, msi_df]
 #create the engine
 engine = create_engine('sqlite:///lolz.db', echo=False)
 
 def getLastGames(num, team, tournament):
     return pd.read_sql_query("SELECT * FROM " 
-                             + "'" + tournament + "'" +
+                            + tournament +
                             " WHERE Game_Name like " "'" + team + "'"
                              + " LIMIT " + str(num), engine)
 
@@ -27,7 +16,7 @@ def getTable(tournament):
     df = pd.read_sql_query("SELECT * FROM " + tournament, engine)
     #df index on col index
     df = df.set_index('index')
-    return df
+    return df 
 
 def makeCSVs():
     linkList = []
@@ -38,3 +27,18 @@ def makeCSVs():
         name = df.iloc[0]['Tournament']
         print(name+' scraped')
         df.to_csv(name + '.csv')
+
+def updateCurrent():
+    linkList = ['https://gol.gg/tournament/tournament-matchlist/LEC%20Summer%202022/',
+                'https://gol.gg/tournament/tournament-matchlist/LCK%20Summer%202022/',
+                'https://gol.gg/tournament/tournament-matchlist/LPL%20Summer%202022/',
+                'https://gol.gg/tournament/tournament-matchlist/LCS%20Summer%202022/'
+                ]
+    for link in linkList:
+        #make the df by webscraping the tournament
+        df = ws.scrapeTourn(link)
+        #get the tournament name from df
+        name = df.iloc[0]['Tournament']
+        print(name+' scraped')
+        df.to_sql(name, engine, if_exists='replace')
+        print(name+' updated')
