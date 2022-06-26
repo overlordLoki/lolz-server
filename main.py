@@ -24,7 +24,10 @@ def getLastGames(num, team, tournament):
                              + " LIMIT " + str(num), engine)
 
 def getTable(tournament):
-    return pd.read_sql_query("SELECT * FROM " + tournament, engine)
+    df = pd.read_sql_query("SELECT * FROM " + tournament, engine)
+    #df index on col index
+    df = df.set_index('index')
+    return df
 
 def makeCSVs():
     linkList = []
@@ -35,6 +38,3 @@ def makeCSVs():
         name = df.iloc[0]['Tournament']
         print(name+' scraped')
         df.to_csv(name + '.csv')
-
-# df = getLastGames(1, 'T1', 'LCK Spring 2022')
-# print(df)
