@@ -38,7 +38,7 @@ def updateCurrent():
         #make the df by webscraping the tournament
         df = ws.scrapeTourn(link)
         #get the tournament name from df
-        name = df.iloc[0]['Tournament']
+        name = df.iloc[0]['Tournament'].replace(' ', '_')
         print(name+' scraped')
         df.to_sql(name, engine, if_exists='replace')
         print(name+' updated')
