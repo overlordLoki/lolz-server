@@ -1,3 +1,4 @@
+from calendar import c
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
@@ -5,9 +6,7 @@ import scrapGame
 import mysql.connector as mysql
 
 db = mysql.connect(host='localhost', user='root', passwd='root', database='lolz')
-
 mycursor = db.cursor()
-
 
 def scrapeTourn(url,tournID):  # sourcery skip: for-append-to-extend, list-comprehension
     #link to the page
@@ -56,6 +55,9 @@ def scrapMatchs(links, num_in_tourn, df,tournID):
         gamelinks = []
         region, tourmament = regionAndTourn(soup)
         matchID = matchIDMaker(tourmament, num_of_match_in_tourn)
+        #if doesMatchExist(matchID): then continue
+        if(doesMatchExist(matchID)):
+            continue
         #if URl contains 'summary' then use makeMatchData else use makeMatchDataNoSum
         if('summary' in link):
             Qmatch = makeMatchData(num_in_tourn, tournID, num_of_match_in_tourn, soup, matchName, menu, gamelinks)
@@ -176,9 +178,7 @@ def matchIDMaker(tourmament_name, num_of_match_in_tourn):
     elif(tourmament_name.__contains__('Worlds')):
         tNum = 6;
     #number for the year
-    yearNum = tourmament_name.split('_')[1][-2:]
-    if(yearNum == 'R)'):
-        yearNum = tourmament_name.split('_')[1]
+    yearNum = tourmament_name[-2:]
     #build id and return it
     s = str(num_of_match_in_tourn) + str(tNum) + str(regNum) + str(yearNum)
     return int(s)
@@ -192,8 +192,10 @@ def tourmAndregion(regionAndTourmament):
     regionAndTourmament = regionAndTourmament[:-1]
     return region,tourmament
 
-#query to to see if database contains the match id
-def checkMatchID(matchID):
-    Q = f'SELECT * FROM matchs WHERE matchID = {str(matchID)};'
-    #if match id is in database return true return true
-    return bool((mycursor.execute(Q)))
+def doesMatchExist(matchID):
+    db = mysql.connect(host='localhost', user='root', passwd='root', database='lolz')
+    mycursor = db.cursor()
+    mycursor.execute(f'SELECT count(*) FROM matchs WHERE matchID = {matchID}')
+    res = mycursor.fetchone()
+    mycursor = db.cursor()
+    return res[0] != 0

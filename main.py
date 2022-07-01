@@ -35,17 +35,30 @@ def addTorn(tournamentID,tournament_name,year, region,):
     db.commit()
     return 1
 
-#query to to see if database contains the match id
-def checkMatchID(matchID):
-    Q = f"SELECT * FROM matchs WHERE matchID = {str(matchID)};"
-    return mycursor.execute(Q).fetchall()
     
+def doesMatchExist(matchID):
+    mycursor.execute(f'SELECT count(*) FROM matchs WHERE matchID = {matchID}')
+    res = mycursor.fetchone()
+    mycursor = db.cursor()
+    return res[0] != 0
+
+
 # isthere = checkMatchID(15022)
 # print(isthere)
-result = mycursor.execute('SELECT * FROM lolz.tournaments;')
-print(result.fetchall())
 
 #ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/MSI%202022/',9)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LCK%20Spring%202022/',1)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LCK%20Spring%20Playoffs%202022/',2)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LPL%20Spring%202022/',3)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LPL%20Spring%20Playoffs%202022/',4)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LEC%20Spring%202022/',5)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LEC%20Spring%20Playoffs%202022/',6)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LCS%20Spring%202022/',7)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LCS%20Spring%20Playoffs%202022/',8)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LCK%20Summer%202022/',10)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LPL%20Summer%202022/',11)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LEC%20Summer%202022/',12)
+ws.scrapeTourn('https://gol.gg/tournament/tournament-matchlist/LCS%20Summer%202022/',13)
 
 # addTorn('3','LPL_Spring_2022', '2022', 'LPL')
 # addTorn('4','LPL_Spring_Playoffs_2022', '2022', 'LPL')

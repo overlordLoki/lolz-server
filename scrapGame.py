@@ -321,9 +321,7 @@ def idMaker(tourmament_name, number_in_tourmament):
     elif(tourmament_name.__contains__('Worlds')):
         tNum = 6;
     #number for the year
-    yearNum = tourmament_name.split('_')[-1][-2:]
-    if(yearNum == 'R)'):
-        yearNum = tourmament_name.split('_')[1]
+    yearNum = tourmament_name[-2:]
     #build id and return it
     s = str(number_in_tourmament) + str(tNum) + str(regNum) + str(yearNum)
     return int(s)
