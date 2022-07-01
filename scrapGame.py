@@ -1,10 +1,9 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-from sqlalchemy import null
 
 
-def scrapeGame(link, num_in_tournament,num_of_match,matchName):
+def scrapeGame(link, num_in_tournament,tournID,num_of_match,matchName,matchID):
     URL = "https://gol.gg"+link;
     source = requests.get(URL, headers = {'User-agent': 'your bot 0.1'}).text
     soup = BeautifulSoup(source, 'lxml')
@@ -37,7 +36,7 @@ def scrapeGame(link, num_in_tournament,num_of_match,matchName):
     #blue team name and win/loss
     blueteambanner  = elem.find('div',class_ ='col-12 blue-line-header').text
     outcome = blueteambanner.split('-')[1]
-    blueTeamName = blueteambanner.split('-')[0].replace('\n','')
+    blueTeamName = blueteambanner.split('-')[0].replace('\n','')[:-1]
     blueWin = False
     if(outcome.__contains__('WIN')):
         blueWin = True
@@ -45,7 +44,7 @@ def scrapeGame(link, num_in_tournament,num_of_match,matchName):
     #red team name and win/loss
     redteambanner = elem.find('div',class_ ='col-12 red-line-header').text
     outcome = redteambanner.split('-')[1]
-    redTeamName = redteambanner.split('-')[0].replace('\n','')
+    redTeamName = redteambanner.split('-')[0].replace('\n','')[:-1]
     redWin = False
     if(outcome.__contains__('WIN')):
         redWin = True
@@ -61,6 +60,10 @@ def scrapeGame(link, num_in_tournament,num_of_match,matchName):
     #region and tourmament
     regionAndTourmament = soup.find('div', class_ = 'col-12 col-sm-7').text.split(' ')
     region,tourmament = tourmAndregion(regionAndTourmament)
+    if('(WR)' in tourmament):
+        tourmament = tourmament.replace('(WR)','')
+        tourmament = tourmament[:-1]
+    tourmament = tourmament.replace(' ','_')
     #.............................................................
     # both red and blue team stats boxs
     Teamstats = soup.find_all('div', class_ = 'col-12 col-sm-6')
@@ -186,18 +189,21 @@ def scrapeGame(link, num_in_tournament,num_of_match,matchName):
         fbaron_time, fbaron_team = barons(rows)
     #............................................................................................................
     #make game and return it (to be added to df)
-    cols = ['ID', 'Game_Name','Match_Name','Num_in_Match','Region', 'Tournament', 'Blue_Team_Name', 'Red_Team_Name', 'Date', 'Week', 'Winner', 
+    cols = ['ID','MatchID', 'tournamentID','Game_Name','Match_Name', 'Tournament','Region','Num_in_Match', 'Blue_Team_Name', 'Red_Team_Name', 
+            'Date', 'Week', 'Winner',
             'Blue_kills', 'Red_kills', 'Total_kills', 'Blue_towers', 'Red_towers', 'Total_towers',
             'Blue_dragons', 'Red_dragons', 'Total_dragons', 'Blue_barons', 'Red_barons', 'Total_barons',
             'Blue_gold', 'Red_gold', 'Total_gold', 'First_blood_team', 'First_blood_time', 'First_tower_team',
             'First_tower_time', 'First_dragon_team', 'First_dragon_time', 'First_rift_herald_team', 'First_rift_herald_time',
             'First_baron_team', 'First_baron_time', 'Game_time','Blue_players', 'Red_players']    
-    GAME = [int(id), gameName,matchName+" "+str(week),int(num_of_match),region, tourmament, blueTeamName, redTeamName, date, week, winner, 
-            int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
-            int(blueDragons) , int(redDragons), int(total_dragons), blueBarons, int(redBarons), int(total_barons),
+    GAME = [int(id),int(matchID),int(tournID), str(gameName),str(matchName), str(tourmament),str(region),int(num_of_match), str(blueTeamName),
+            str(redTeamName), str(date), str(week), 
+            str(winner), int(blueKills), int(redKills), int(total_kills) , int(blueTowers), int(redTowers), int(total_towers),
+            int(blueDragons) , int(redDragons), int(total_dragons), str(blueBarons), int(redBarons), int(total_barons),
             float(blueGold), float(redGold), float(total_gold),
-            firstblood_team, int(fb_time), firsttower_team, int(ft_time), fd_team, int(fd_time), fr_team, int(fr_time), fbaron_team,
-            int(fbaron_time),gametime, bluePlayers, redPlayers]
+            str(firstblood_team), int(fb_time), str(firsttower_team), int(ft_time), str(fd_team), int(fd_time),
+            str(fr_team), int(fr_time), str(fbaron_team),
+            int(fbaron_time),int(gametime), str(bluePlayers), str(redPlayers)]
     gamedf = pd.DataFrame([GAME], columns = cols)
     return gamedf
 
@@ -315,15 +321,22 @@ def idMaker(tourmament_name, number_in_tourmament):
     elif(tourmament_name.__contains__('Worlds')):
         tNum = 6;
     #number for the year
-    yearNum = tourmament_name.split(' ')[-1][-2:]
+    yearNum = tourmament_name.split('_')[-1][-2:]
     if(yearNum == 'R)'):
-        yearNum = tourmament_name.split(' ')[1]
+        yearNum = tourmament_name.split('_')[1]
     #build id and return it
     s = str(number_in_tourmament) + str(tNum) + str(regNum) + str(yearNum)
     return int(s)
 
-
+def regionAndTourn(soup):
+    #region and tourmament
+    regionAndTourmament = soup.find('div', class_ = 'col-12 col-sm-7').text.split(' ')
+    region,tourmament = tourmAndregion(regionAndTourmament)
+    if('(WR)' in tourmament):
+        tourmament = tourmament.replace('(WR)','')
+        tourmament = tourmament[:-1]
+    return region,tourmament
 
 #for testing purposes
-# gametoprint = scrapeGame('/game/stats/40616/page-game/',1,1,'OMG vs TT')
-# gametoprint.to_csv('game.csv')
+#gametoprint = scrapeGame('/game/stats/40615/page-game/',1,1,'OMG vs TT')
+#gametoprint.to_csv('game.csv')
