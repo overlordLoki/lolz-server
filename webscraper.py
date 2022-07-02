@@ -6,7 +6,7 @@ import requests
 import scrapGame
 import mysql.connector as mysql
 
-db = mysql.connect(host='localhost', user='root', passwd='root', database='lolz')
+db = mysql.connect(host='140.238.205.186', user='loki', passwd='Thethethe3!', database='lolz')
 mycursor = db.cursor()
 
 def scrapeTourn(url,tournID):  # sourcery skip: for-append-to-extend, list-comprehension
@@ -78,7 +78,6 @@ def scrapMatchs(links, num_in_tourn, df,tournID):
             num_of_match += 1
             Qgame = QAddGame(game)
             mycursor.execute(Qgame)
-            print('Game inserted')
     db.commit()
     print('committed')
     return df
