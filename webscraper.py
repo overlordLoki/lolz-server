@@ -1,3 +1,4 @@
+from ast import If
 from calendar import c
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -45,6 +46,8 @@ def scrapMatchs(links, num_in_tourn, df,tournID):
     num_of_match_in_tourn = 1;
     #for each link in the list, scrape the page building a match
     for link in links:
+        if('page-preview' in link):
+            continue
         URL = "https://gol.gg"+link;
         source = requests.get(URL, headers = {'User-agent': 'your bot 0.1'}).text
         soup = BeautifulSoup(source, 'lxml')
