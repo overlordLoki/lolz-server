@@ -195,7 +195,7 @@ def tourmAndregion(regionAndTourmament):
     return region,tourmament
 
 def doesMatchExist(matchID):
-    db = mysql.connect(host='localhost', user='root', passwd='root', database='lolz')
+    db = mysql.connect(host='140.238.205.186', user='loki', passwd='Thethethe3!', database='lolz')
     mycursor = db.cursor()
     mycursor.execute(f'SELECT count(*) FROM matchs WHERE matchID = {matchID}')
     res = mycursor.fetchone()
