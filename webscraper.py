@@ -155,7 +155,7 @@ def makeMatchDataNoSum(num_in_tourn, tournID, num_of_match_in_tourn, soup, match
     teams = blueTeam + ',' + redTeam
     #make the match query
     Qmatch = ('INSERT INTO matchs (matchID,matchName, tournamentID, date, tournament_name,teams,region,num_in_tourn) VALUES ('
-              ''+str(matchID)+',"'+str(matchName)+'",'+str(tournID)+',"'+str(date)+'","'+str(tourmament)+'","'+str(teams)+'","'+str(region)+'",'+str(num_in_tourn)+');')
+              ''+str(matchID)+',"'+str(matchName)+'",'+str(tournID)+',"'+str(date)+'","'+str(tourmament)+'","'+str(teams)+'","'+str(region)+'",'+str(num_of_match_in_tourn)+');')
     return Qmatch
 
 def matchIDMaker(tourmament_name, num_of_match_in_tourn):

@@ -14,10 +14,10 @@ def getLastGames(num, team, tournament):
     return pd.read_sql_query("SELECT * FROM " 
                             + tournament +
                             " WHERE Game_Name like " "'" + team + "'"
-                             + " LIMIT " + str(num), engine)
+                             + " LIMIT " + str(num), db)
 
 def getTable(tournament):
-    df = pd.read_sql_query("SELECT * FROM " + tournament, engine)
+    df = pd.read_sql_query("SELECT * FROM " + tournament, db)
     #df index on col index
     df = df.set_index('index')
     return df 
@@ -91,5 +91,3 @@ def remakeTourns():
     addTorn('12','LEC_Summer_2022', '2022', 'LEC')
     addTorn('13','LCS_Summer_2022', '2022', 'LCS')
     print('done')
-    
-remakeData()
