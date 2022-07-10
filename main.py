@@ -16,7 +16,7 @@ def getLastGames(num, team, tournament):
                             " WHERE Game_Name like " "'" + team + "'"
                              + " LIMIT " + str(num), db)
 
-def getTable1(tournament):
+def getTable(tournament):
     # sourcery skip: assign-if-exp, inline-immediately-returned-variable, lift-return-into-if
     db = mysql.connect(host='140.238.205.186', user='loki', passwd='Thethethe3!', database='lolz')
     tournament = str(tournament)
@@ -24,7 +24,12 @@ def getTable1(tournament):
         df = pd.read_sql_query(f'SELECT * FROM games WHERE tournamentID = "{tournament}"', db)
     else:
         df = pd.read_sql_query(f'SELECT * FROM games WHERE tournament_name = "{tournament}"', db)
-    return df 
+    return df
+
+def getTable1(table, cursor):
+    if(table in ['tournaments','matchs','games']):
+        df = pd.read_sql_query(f'SELECT * FROM lolz.{table}', db)
+    return df
 
 
 def updateCurrent():
