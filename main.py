@@ -16,12 +16,12 @@ def getLastGames(num, team, tournament):
                             " WHERE Game_Name like " "'" + team + "'"
                              + " LIMIT " + str(num), db)
 
-def getTable(tournament):
+def getTable1(tournament):
     # sourcery skip: assign-if-exp, inline-immediately-returned-variable, lift-return-into-if
     db = mysql.connect(host='140.238.205.186', user='loki', passwd='Thethethe3!', database='lolz')
     tournament = str(tournament)
     if type(tournament) == int:
-        df = pd.read_sql_query(f'SELECT * FROM games WHERE tournamentID = {tournament}', db)
+        df = pd.read_sql_query(f'SELECT * FROM games WHERE tournamentID = "{tournament}"', db)
     else:
         df = pd.read_sql_query(f'SELECT * FROM games WHERE tournament_name = "{tournament}"', db)
     return df 
@@ -95,3 +95,4 @@ def remakeTourns():
     addTorn('12','LEC_Summer_2022', '2022', 'LEC')
     addTorn('13','LCS_Summer_2022', '2022', 'LCS')
     print('done')
+
