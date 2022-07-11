@@ -37,6 +37,7 @@ def getRecentGames(db, team, tournament, num):
           +'LIMIT ' + str(num))
     return pd.read_sql_query(query, db)
 
+
 def updateCurrent():
     linkList = ['https://gol.gg/tournament/tournament-matchlist/LEC%20Summer%202022/',
                 'https://gol.gg/tournament/tournament-matchlist/LCK%20Summer%202022/',
