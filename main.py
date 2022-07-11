@@ -26,11 +26,16 @@ def getTable(tournament):
         df = pd.read_sql_query(f'SELECT * FROM games WHERE tournament_name = "{tournament}"', db)
     return df
 
-def getTable1(table, cursor):
+def getTable1(table, db):
     if(table in ['tournaments','matchs','games']):
         df = pd.read_sql_query(f'SELECT * FROM lolz.{table}', db)
     return df
 
+def getRecentGames(db, team, tournament, num):
+    query = ('SELECT * FROM games ' +
+          'WHERE matchname LIKE "' + '%' + team + '%" AND tournament_name = ' + '"' + tournament + '" ' 
+          +'LIMIT ' + str(num))
+    return pd.read_sql_query(query, db)
 
 def updateCurrent():
     linkList = ['https://gol.gg/tournament/tournament-matchlist/LEC%20Summer%202022/',
