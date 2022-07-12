@@ -27,5 +27,13 @@ def getLastGames(num, team):
 def getTeam(team):
     return db.getTeamLast5Games('team').to_json(orient='records')
 
+@app.route("/api/v1/getTournaments") # http://localhost:5000/api/v1/getTournaments
+def getTournaments():
+    return db.getTournaments().to_json(orient='records')
+
+@app.route("/api/v1/getTeamNames/<string:tournament>") # http://localhost:5000/api/v1/getTeamNames/<string:tournament>
+def getTeamNames(tournament):
+    return db.getTeamNames(tournament).to_json(orient='records')
+
 if __name__ == "__main__":
     app.run(debug=True)

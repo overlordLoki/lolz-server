@@ -43,18 +43,20 @@ def getTournaments():
 #get team names given a tournament name
 def getTeamNames(tournament):
     df = getTable(tournament)
-    teams = df['matchname'].unique()
-    return teams
+    blue = df['Blue_Team_Name'].unique()
+    red = df['Red_Team_Name'].unique()
+    return list({*blue, *red})
 
 
 def updateCurrent():
-    linkList = ['https://gol.gg/tournament/tournament-matchlist/LEC%20Summer%202022/',
-                'https://gol.gg/tournament/tournament-matchlist/LCK%20Summer%202022/',
+    linkList = ['https://gol.gg/tournament/tournament-matchlist/LCK%20Summer%202022/',
                 'https://gol.gg/tournament/tournament-matchlist/LPL%20Summer%202022/',
+                'https://gol.gg/tournament/tournament-matchlist/LEC%20Summer%202022/',
                 'https://gol.gg/tournament/tournament-matchlist/LCS%20Summer%202022/'
                 ]
-    for link in linkList:
-        ws.scrapeTourn(link)
+    for NUM, link in enumerate(linkList, start=10):
+        ws.scrapeTourn(link,NUM)
+    
 
 #add tournament to database
 def addTorn(tournamentID,tournament_name,year, region,):
