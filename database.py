@@ -1,41 +1,35 @@
+#this file is for calling premade meatheds for the database
 import pandas as pd
-from sqlalchemy import create_engine
+import sqlalchemy as sql
 import webscraper as ws
 import mysql.connector as mysql
-#create the engine
-#engine = create_engine('sqlite:///lolz.db', echo=False)
-#old databases
-#db = mysql.connect(host='localhost', user='root', passwd='root', database='lolz')
-#connect to the database on server
 db = mysql.connect(host='140.238.205.186', user='loki', passwd='Thethethe3!', database='lolz')
 mycursor = db.cursor()
+engine = sql.create_engine(
+    'mysql+mysqlconnector://loki:Thethethe3!@140.238.205.186/lolz',
+    connect_args= dict(host='140.238.205.186', port=3306))
 
-def getLastGames(num, team, tournament):
-    return pd.read_sql_query("SELECT * FROM " 
-                            + tournament +
-                            " WHERE Game_Name like " "'" + team + "'"
-                             + " LIMIT " + str(num), db)
-
+#get the table from the database
 def getTable(tournament):
     # sourcery skip: assign-if-exp, inline-immediately-returned-variable, lift-return-into-if
     db = mysql.connect(host='140.238.205.186', user='loki', passwd='Thethethe3!', database='lolz')
     tournament = str(tournament)
     if type(tournament) == int:
-        df = pd.read_sql_query(f'SELECT * FROM games WHERE tournamentID = "{tournament}"', db)
+        df = pd.read_sql_query(f'SELECT * FROM games WHERE tournamentID = "{tournament}"', engine)
     else:
-        df = pd.read_sql_query(f'SELECT * FROM games WHERE tournament_name = "{tournament}"', db)
+        df = pd.read_sql_query(f'SELECT * FROM games WHERE tournament_name = "{tournament}"', engine)
     return df
 
 def getTable1(table, db):
     if(table in ['tournaments','matchs','games']):
-        df = pd.read_sql_query(f'SELECT * FROM lolz.{table}', db)
+        df = pd.read_sql_query(f'SELECT * FROM lolz.{table}', engine)
     return df
 
 def getRecentGames(db, team, tournament, num):
     query = ('SELECT * FROM games ' +
           'WHERE matchname LIKE "' + '%' + team + '%" AND tournament_name = ' + '"' + tournament + '" ' 
           +'LIMIT ' + str(num))
-    return pd.read_sql_query(query, db)
+    return pd.read_sql_query(query, engine)
 
 
 def updateCurrent():
@@ -54,7 +48,7 @@ def addTorn(tournamentID,tournament_name,year, region,):
     db.commit()
     return 1
 
-    
+#does match exist in database
 def doesMatchExist(matchID):
     mycursor.execute(f'SELECT count(*) FROM matchs WHERE matchID = {matchID}')
     res = mycursor.fetchone()
