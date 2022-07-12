@@ -25,7 +25,7 @@ def getLastGames(num, team):
 
 @app.route("/api/v1/getTeam/<string:team>") # http://localhost:5000/api/v1/getTeam/<string:team>
 def getTeam(team):
-    return db.getTeamLast5Games('team').to_json(orient='records')
+    return db.getTeamLast5Games(team).to_json(orient='records')
 
 @app.route("/api/v1/getTournaments") # http://localhost:5000/api/v1/getTournaments
 def getTournaments():
@@ -33,7 +33,7 @@ def getTournaments():
 
 @app.route("/api/v1/getTeamNames/<string:tournament>") # http://localhost:5000/api/v1/getTeamNames/<string:tournament>
 def getTeamNames(tournament):
-    return db.getTeamNames(tournament).to_json(orient='records')
+    return jsonify(db.getTeamNames(tournament))
 
 if __name__ == "__main__":
     app.run(debug=True)
