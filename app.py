@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+import database as db
 
 app = Flask(__name__)
 
@@ -21,6 +22,10 @@ def scrape():
 def getLastGames(num, team):
     teamsRegon = ''
     return jsonify(teamsRegon)
+
+@app.route("/api/v1/getTeam/<string:team>") # http://localhost:5000/api/v1/getTeam/<string:team>
+def getTeam(team):
+    return db.getTeamLast5Games('team').to_json(orient='records')
 
 if __name__ == "__main__":
     app.run(debug=True)

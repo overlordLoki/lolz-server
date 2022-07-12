@@ -25,11 +25,26 @@ def getTable1(table, db):
         df = pd.read_sql_query(f'SELECT * FROM lolz.{table}', engine)
     return df
 
-def getRecentGames(db, team, tournament, num):
+def getRecentGames(team, tournament, num):
     query = ('SELECT * FROM games ' +
           'WHERE matchname LIKE "' + '%' + team + '%" AND tournament_name = ' + '"' + tournament + '" ' 
           +'LIMIT ' + str(num))
     return pd.read_sql_query(query, engine)
+
+def getTeamLast5Games(team):
+    query = ('SELECT * FROM games ' +
+          'WHERE matchname LIKE "' + '%' + team + '%"  LIMIT 5')
+    return pd.read_sql_query(query, engine)
+
+def getTournaments():
+    query = 'SELECT * FROM tournaments'
+    return pd.read_sql_query(query, engine)
+
+#get team names given a tournament name
+def getTeamNames(tournament):
+    df = getTable(tournament)
+    teams = df['matchname'].unique()
+    return teams
 
 
 def updateCurrent():
