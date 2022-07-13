@@ -41,19 +41,22 @@ def bestTeamSim(df_testing):
     wins = 0
     loses = 0
     bestbanlist = []
+    bestunitsovertime = []
     for banlist in banlistCombo:
         testUnits = 100
         testWins = 0
         testLoses = 0
-        testUnits , testWins, testLoses = runSim(df_testing, 'under', 21.5, 'kills', banlist)
+        testUnitsOvertime = []
+        testUnits , testWins, testLoses, testUnitsOvertime = runSim(df_testing, 'under', 21.5, 'kills', banlist)
         if(testUnits > units):
             units = testUnits
             wins = testWins
             loses = testLoses
             bestbanlist = banlist
+            bestunitsovertime = testUnitsOvertime
     totalbets = wins + loses
     winrate = round(wins/totalbets,2)
-    return bestbanlist, units , wins, loses, winrate, totalbets
+    return bestbanlist, units , wins, loses, winrate, totalbets, bestunitsovertime
 
 def makeCombos(input):
     return sum((list(map(list, combinations(input, i))) for i in range(len(input) + 1)), [])
@@ -62,6 +65,7 @@ def runSim(df ,choice,num,betType,banList):
     units = 100.0
     wins = 0
     loses = 0
+    unitsOvertime = [units]
     for i in range(len(df)):
         blueteam = df['Blue_Team_Name'][i]
         redteam = df['Red_Team_Name'][i]
@@ -89,4 +93,5 @@ def runSim(df ,choice,num,betType,banList):
             units += 0.83
         else:
             units -= 1
-    return units , wins, loses
+        unitsOvertime.append(units)
+    return units , wins, loses, unitsOvertime
