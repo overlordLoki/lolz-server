@@ -8,7 +8,7 @@ def bestTeamSim(df_testing):
     #simulation of a beting strategy
     tournament_name = df_testing['tournament_name'][0]
     teamsList = db.getTeamNames(tournament_name)
-    banlistCombo = makeCombos(teamsList)
+    banlistCombo = MakePermutations(teamsList)
     units =100.0
     wins = 0
     loses = 0
@@ -19,7 +19,7 @@ def bestTeamSim(df_testing):
         testWins = 0
         testLoses = 0
         testUnitsOvertime = []
-        testUnits , testWins, testLoses, testUnitsOvertime = runSim(df_testing, 'under', 21.5, 'kills', banlist, keys = ['banList'])
+        testUnits , testWins, testLoses, testUnitsOvertime = runSim(df_testing, 'under', 21.5, 'kills', banlist, keys = ['banList'] )
         if(testUnits > units):
             units = testUnits
             wins = testWins
@@ -29,9 +29,6 @@ def bestTeamSim(df_testing):
     totalbets = wins + loses
     winrate = round(wins/totalbets,2)
     return bestbanlist, units , wins, loses, winrate, totalbets, bestunitsovertime
-
-def makeCombos(input):
-    return sum((list(map(list, combinations(input, i))) for i in range(len(input) + 1)), [])
 
 def runSim(df ,choice,num,betType,banList, keys):
     units = 100.0
@@ -82,3 +79,7 @@ def runSim(df ,choice,num,betType,banList, keys):
 #fuction to for true or false if game is first in match
 def isFirstOfMatch(df,i):
     return df['Num_in_Match'][i] == 1
+
+#function to make all possible permutations of a list
+def MakePermutations(input):
+    return sum((list(map(list, combinations(input, i))) for i in range(len(input) + 1)), [])
