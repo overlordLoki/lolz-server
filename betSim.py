@@ -1,37 +1,9 @@
 import pandas as pd
 import database as db
 from itertools import combinations
+import betTypes as bt
 
-def towerBet(gameNum, df, underOrOver, towerNum):
-    game = df.iloc[gameNum]
-    return 1 if (
-            underOrOver == 'under') and (game['Total_towers'] > towerNum) or (
-            underOrOver != 'under' and (game['Total_towers'] < towerNum)) else 0
-
-def dragonsBet(gameNum, df, underOrOver, dragonNum):
-    game = df.iloc[gameNum]
-    return 1 if (
-            underOrOver == 'under') and (game['Total_dragons'] > dragonNum) or (
-            underOrOver != 'under' and (game['Total_dragons'] < dragonNum)) else 0
-
-def killsBet(gameNum, df, underOrOver, killsNum):
-    game = df.iloc[gameNum]
-    return 1 if (
-        underOrOver == 'under') and (game['Total_kills'] > killsNum) or (
-        underOrOver != 'under' and (game['Total_kills'] < killsNum)) else 0
-
-def baronsBet(gameNum, df, underOrOver, baronNum):
-    game = df.iloc[gameNum]
-    return 1 if (
-        underOrOver == 'under') and (game['Total_barons'] > baronNum) or (
-        underOrOver != 'under' and (game['Total_barons'] < baronNum)) else 0
-
-def gameTimeBet(gameNum, df, underOrOver, timeNum):
-    game = df.iloc[gameNum]
-    return 1 if (
-        underOrOver == 'under') and (game['Game_time'] > timeNum) or (
-        underOrOver != 'under' and (game['Game_time'] < timeNum)) else 0
-
+#function to get the best banList simulation
 def bestTeamSim(df_testing):
     #simulation of a beting strategy
     tournament_name = df_testing['tournament_name'][0]
@@ -47,7 +19,7 @@ def bestTeamSim(df_testing):
         testWins = 0
         testLoses = 0
         testUnitsOvertime = []
-        testUnits , testWins, testLoses, testUnitsOvertime = runSim(df_testing, 'under', 21.5, 'kills', banlist)
+        testUnits , testWins, testLoses, testUnitsOvertime = runSim(df_testing, 'under', 21.5, 'kills', banlist, keys = ['banList'])
         if(testUnits > units):
             units = testUnits
             wins = testWins
@@ -61,32 +33,43 @@ def bestTeamSim(df_testing):
 def makeCombos(input):
     return sum((list(map(list, combinations(input, i))) for i in range(len(input) + 1)), [])
 
-def runSim(df ,choice,num,betType,banList):
+def runSim(df ,choice,num,betType,banList, keys):
     units = 100.0
     wins = 0
     loses = 0
     unitsOvertime = [units]
     for i in range(len(df)):
-        blueteam = df['Blue_Team_Name'][i]
-        redteam = df['Red_Team_Name'][i]
-        if (blueteam in banList) or (redteam in banList):
+        #key checks
+        #team ban list key
+        if('banList' in keys):
+            blueteam = df['Blue_Team_Name'][i]
+            redteam = df['Red_Team_Name'][i]
+            if (blueteam in banList) or (redteam in banList):
+                continue
+        #first of match key
+        if ('isFirstOfMatch' in keys) and not (isFirstOfMatch(df, i)):
             continue
+        #check if no more units to bet
         if (units < 1):
             print(f'no more units left after {str(i)} games')
             return units , wins, loses
+
+        #do the bet 
         if(betType == 'kills'):
-            outcome = killsBet(i, df, choice, num)
+            outcome = bt.killsBet(i, df, choice, num)
         elif(betType == 'dragons'):
-            outcome = dragonsBet(i, df, choice, num)
+            outcome = bt.dragonsBet(i, df, choice, num)
         elif(betType == 'barons'):
-            outcome = baronsBet(i, df, choice, num)
+            outcome = bt.baronsBet(i, df, choice, num)
         elif(betType == 'tower'):
-            outcome = towerBet(i, df, choice, num)
+            outcome = bt.towerBet(i, df, choice, num)
         elif(betType == 'time'):
-            outcome = gameTimeBet(i, df, choice, num)
+            outcome = bt.gameTimeBet(i, df, choice, num)
         else:
             print('invalid bet type')
             return units , wins, loses
+
+        #update units
         wins += outcome
         loses += 1 - outcome
         if(outcome == 1):
@@ -95,3 +78,7 @@ def runSim(df ,choice,num,betType,banList):
             units -= 1
         unitsOvertime.append(units)
     return units , wins, loses, unitsOvertime
+
+#fuction to for true or false if game is first in match
+def isFirstOfMatch(df,i):
+    return df['Num_in_Match'][i] == 1
