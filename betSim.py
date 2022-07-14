@@ -3,26 +3,9 @@ import database as db
 from itertools import combinations
 import betTypes as bt
 
-#function to simulate a beting strategy with exclusion of a some teams
-def bestTeamSim(df_testing):
-    #simulation of a beting strategy
-    units =100.0
-    wins = 0
-    loses = 0
-    banList = []
-    bestunitsovertime = []
-    keys = ['banList']
-    units , wins , loses , banList, bestunitsovertime = runSim(df_testing, 'blue', 21.5, 'kills', keys)
-    totalbets = wins + loses
-    winrate = round(wins/totalbets,2)
-    return units , wins, loses, winrate, totalbets,banList, bestunitsovertime
-
+#function to run the sim
 def runSim(df ,choice,num,betType , keys):
-    units = 100.0
-    wins = 0
-    loses = 0     
-    unitsOvertime = [units]
-    banList = []
+    units, wins, loses, unitsOvertime , banList = setDefults()
     #team ban list key
     if('banList' in keys):
         banList = bestBanList(df, choice, num, betType, keys)
@@ -54,7 +37,7 @@ def runSim(df ,choice,num,betType , keys):
             outcome = bt.gameTimeBet(i, df, choice, num)
         else:
             print('invalid bet type')
-            return banList, units , wins, loses, unitsOvertime
+            return units , wins, loses,banList, unitsOvertime
 
         #update units
         wins += outcome
@@ -64,15 +47,8 @@ def runSim(df ,choice,num,betType , keys):
         else:
             units -= 1
         unitsOvertime.append(units)
-    return banList, units , wins, loses, unitsOvertime
+    return units , wins, loses,banList, unitsOvertime
 
-#fuction to for true or false if game is first in match
-def isFirstOfMatch(df,i):
-    return df['Num_in_Match'][i] == 1
-
-#function to make all possible permutations of a list
-def makeCombonations(input):
-    return sum((list(map(list, combinations(input, i))) for i in range(len(input) + 1)), [])
 
 #function to get the best banList
 def bestBanList(df ,choice,num,betType , keys):
@@ -92,10 +68,7 @@ def bestBanList(df ,choice,num,betType , keys):
 
 #run sim for getting best banlist
 def banSim(df ,choice,num,betType , banList, keys):
-    units = 100.0
-    wins = 0
-    loses = 0
-    unitsOvertime = [units]
+    units, wins, loses, unitsOvertime , banlist = setDefults()
     for i in range(len(df)):
         #check ban list
         blueteam = df['Blue_Team_Name'][i]
@@ -135,3 +108,53 @@ def banSim(df ,choice,num,betType , banList, keys):
             units -= 1
         unitsOvertime.append(units)
     return units
+
+#function to get the best key combinations
+def bestKeysSim(df_testing, keys):
+    #set starting values
+    units =100.0
+    wins = 0
+    loses = 0
+    bestbanlist = []
+    bestunitsovertime = []
+    bestKeySet = []
+    keysCombo = makeCombonations(keys)
+    for keylist in keysCombo:
+        testUnits = 100
+        testWins = 0
+        testLoses = 0
+        testUnitsOvertime = []
+        testbanlist = []
+        #units , wins , loses , banList, bestunitsovertime
+        testUnits , testWins, testLoses, testbanlist, testUnitsOvertime = runSim(df_testing, 'under', 21.5, 'kills', keylist )
+        if(testUnits > units):
+            units = testUnits
+            wins = testWins
+            loses = testLoses
+            bestbanlist = testbanlist
+            bestunitsovertime = testUnitsOvertime
+            bestKeySet = keylist
+        
+    totalbets = wins + loses
+    winrate = round(wins/totalbets,2)
+    return units , wins, loses, winrate, bestbanlist, totalbets, bestunitsovertime, bestKeySet
+
+
+#helper functions
+
+#function to set default values
+def setDefults():
+    units = 100.0
+    wins = 0
+    loses = 0     
+    unitsOvertime = [units]
+    banList = []
+    return units,wins,loses,unitsOvertime, banList
+
+#fuction to for true or false if game is first in match
+def isFirstOfMatch(df,i):
+    return df['Num_in_Match'][i] == 1
+
+#function to make all possible permutations of a list
+def makeCombonations(input):
+    return sum((list(map(list, combinations(input, i))) for i in range(len(input) + 1)), [])
