@@ -4,6 +4,9 @@ import database as db
 from itertools import combinations
 import betTypes as bt
 
+#dataframe to check number of games in match
+df_numInMatch = pd.read_sql_query('SELECT matchID, COUNT(matchID) FROM games GROUP BY matchID', db.engine)
+
 #function to run the sim
 def runSim(df ,choice,num,betType , keys):
     units, wins, loses, unitsOvertime , banList = setDefults()
@@ -166,7 +169,7 @@ def isFirstOfMatch(df,i):
 
 #fuction to for true or false if game is last in match
 def isLastOfMatch(df,i):
-    return df['Num_in_Match'][i] == df['Num_Games_in_Match'][i]
+    return df['Num_in_Match'][i] == df_numInMatch['']
 
 #fuction to for true or false if game is 2ed in match
 def isSecondOfMatch(df,i):
