@@ -169,7 +169,8 @@ def isFirstOfMatch(df,i):
 
 #fuction to for true or false if game is last in match
 def isLastOfMatch(df,i):
-    return df['Num_in_Match'][i] == df_numInMatch['']
+    matchID = df['matchID'][i]
+    return df['Num_in_Match'][i] == df_numInMatch.loc[df_numInMatch['matchID'] == matchID].iloc[0,1]
 
 #fuction to for true or false if game is 2ed in match
 def isSecondOfMatch(df,i):
