@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 import database as db
 from itertools import combinations
@@ -19,6 +20,12 @@ def runSim(df ,choice,num,betType , keys):
                 continue
         #first of match key
         if ('isFirstOfMatch' in keys) and not (isFirstOfMatch(df, i)):
+            continue
+        #is last of match key
+        if('isLastOfMatch' in keys) and not (isLastOfMatch(df, i)):
+            continue
+        #is second of match key
+        if('isSecondOfMatch' in keys) and not (isSecondOfMatch(df, i)):
             continue
         #check if no more units to bet
         if (units < 1):
@@ -79,6 +86,12 @@ def banSim(df ,choice,num,betType , banList, keys):
         #first of match key
         if ('isFirstOfMatch' in keys) and not (isFirstOfMatch(df, i)):
             continue
+        #is last of match key
+        if('isLastOfMatch' in keys) and not (isLastOfMatch(df, i)):
+            continue
+        #is second of match key
+        if('isSecondOfMatch' in keys) and not (isSecondOfMatch(df, i)):
+            continue
         #check if no more units to bet
         if (units < 1):
             print(f'no more units left after {str(i)} games')
@@ -112,11 +125,7 @@ def banSim(df ,choice,num,betType , banList, keys):
 #function to get the best key combinations
 def bestKeysSim(df_testing, keys):
     #set starting values
-    units =100.0
-    wins = 0
-    loses = 0
-    bestbanlist = []
-    bestunitsovertime = []
+    units, wins, loses, bestunitsovertime , bestbanlist = setDefults()
     bestKeySet = []
     keysCombo = makeCombonations(keys)
     for keylist in keysCombo:
@@ -154,6 +163,14 @@ def setDefults():
 #fuction to for true or false if game is first in match
 def isFirstOfMatch(df,i):
     return df['Num_in_Match'][i] == 1
+
+#fuction to for true or false if game is last in match
+def isLastOfMatch(df,i):
+    return df['Num_in_Match'][i] == df['Num_Games_in_Match'][i]
+
+#fuction to for true or false if game is 2ed in match
+def isSecondOfMatch(df,i):
+    return df['Num_in_Match'][i] == 2
 
 #function to make all possible permutations of a list
 def makeCombonations(input):
