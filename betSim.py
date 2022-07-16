@@ -3,14 +3,15 @@ import pandas as pd
 import simFuctions as sim
 
 #function to run the sim
-def runSim(df ,choice,num,betType , keys):
+def runSim(df ,choice,betType , keys):
     units, wins, loses, unitsOvertime , banList = sim.setDefults()
     #team ban list key
     banList = []
     count = 0
     if('banList' in keys):
-        banList,count = bestBanList(df, choice, num, betType, keys)
+        banList,count = bestBanList(df, choice, betType, keys)
     for i in range(len(df)):
+        num = sim.decideNum(df, i, betType)
         #key checks
         if sim.isSkipKey(df, keys, banList,i,num) == 1:
             continue
@@ -21,38 +22,25 @@ def runSim(df ,choice,num,betType , keys):
     return units , wins, loses,banList, unitsOvertime,count
 
 #function to get the best key combinations
-def bestKeysSim(df_testing, keys):
+def bestKeysSim(df_testing, keys, betTypes):
     count =0
-    #set starting values
-    units, wins, loses, bestunitsovertime , bestbanlist = sim.setDefults()
-    bestKeySet = []
+    df_top10 = pd.DataFrame(columns=['units','wins','loses','totalbets','winrate',
+                                     'unitsovertime','banList','KeySet','betType','choice'])
     keysCombo = sim.makeCombonations(keys)
-    for keylist in keysCombo:
-        count += 1
-        testUnits = 100
-        testWins = 0
-        testLoses = 0
-        testUnitsOvertime = []
-        testbanlist = []
-        #units , wins , loses , banList, bestunitsovertime
-        testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, 'under', 21.5, 'kills', keylist )
-        count += addToCount
-        if(testUnits > units):
-            units = testUnits
-            wins = testWins
-            loses = testLoses
-            bestbanlist = testbanlist
-            bestunitsovertime = testUnitsOvertime
-            bestKeySet = keylist
-        
-    totalbets = wins + loses
-    winrate = round(wins/totalbets,2)
-    return units , wins, loses, winrate, bestbanlist, totalbets, bestunitsovertime, bestKeySet, count
+    for choice in ['under','over']:
+        for betType in betTypes:
+            for keylist in keysCombo:
+                count += 1
+                testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType, keylist )
+                count += addToCount
+                df_top10 = sim.checkIfHigher(df_top10, testUnits, testWins, testLoses, testbanlist, testUnitsOvertime, keylist, betType, choice)
+                    
+    return df_top10, count
 
 #keys functions
 
 #function to get the best banList
-def bestBanList(df ,choice,num,betType , keys):
+def bestBanList(df ,choice,betType , keys):
     count =0
     #simulation of a beting strategy
     tournament_name = df['tournament_name'][0]
@@ -63,19 +51,31 @@ def bestBanList(df ,choice,num,betType , keys):
     for banlist in banlistCombo:
         count += 1
         testUnits = 100
-        testUnits = banSim(df, choice, num, betType, banlist, keys)
+        testUnits = banSim(df, choice, betType, banlist, keys)
         if(testUnits > units):
             units = testUnits
             bestbanlist = banlist
     return bestbanlist, count
 
 #run sim for getting best banlist
-def banSim(df ,choice,num,betType , banList, keys):
+def banSim(df ,choice,betType , banList, keys):
     units, wins, loses, unitsOvertime , ignore_this = sim.setDefults()
     for i in range(len(df)):
+        num = sim.decideNum(df, i, betType)
         #key checks
         if sim.isSkipKey(df, keys, banList,i,num) == 1:
             continue
         units, wins, loses, unitsOvertime = sim.doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i)
     return units
 
+#print the results of the sim
+def printSim(df, i):
+    print('outcome: ')
+    print(f'units: {str(df["units"][i])}')
+    print(f'wins: {str(df["wins"][i])}')
+    print(f'loses: {str(df["loses"][i])}')
+    print(f'total bets: {str(df["totalbets"][i])}')
+    print(f'winrate: {str(df["winrate"][i])}')
+    print(f'choice: {str(df["choice"][i])}')
+    print(f'key set: {str(df["KeySet"][i])}')
+    print(f'exclude list: {str(df["banList"][i])}')

@@ -1,4 +1,6 @@
 from itertools import combinations
+import re
+from numpy import True_
 import pandas as pd
 import betTypes as bt
 import database as db
@@ -72,7 +74,7 @@ def makeBet(i, df, choice, num, betType):
         return bt.dragonsBet(i, df, choice, num)
     elif betType == 'barons':
         return bt.baronsBet(i, df, choice, num)
-    elif betType == 'tower':
+    elif betType == 'towers':
         return bt.towerBet(i, df, choice, num)
     else:
         return bt.gameTimeBet(i, df, choice, num)
@@ -90,3 +92,51 @@ def doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i):
         units -= 1
     unitsOvertime.append(units)
     return units, wins, loses, unitsOvertime
+
+#function to decide the number the booky makes
+def decideNum(df, i, betType):
+    #decide the number the booky makes
+    #kill bet number
+    if (betType == 'kills'):
+        if i >= 5:
+            if df['region'][i] == 'LPL':
+                return 25.5
+            if df['region'][i] == 'LCK':
+                return 21.5
+            if df['region'][i] == 'LCS':
+                return 21.5
+            if df['region'][i] == 'LEC':
+                return 22.5
+        return df['Total_kills'][:i].mean()
+    #dragon bet number
+    if (betType == 'dragons'):
+        return 4.5
+    if betType == 'barons':
+        return 1.5
+    if betType == 'towers':
+        return 11.5
+    if betType == 'gameTime':
+        return 32.30
+    return 32.30
+
+#if units is higher add to df, remove smallest unit row
+def checkIfHigher(df, testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,keylist,betType,choice):
+    totalbets = testWins + testLoses
+    winrate = round(testWins/totalbets,2)
+    if len(df.index) < 10:
+        df.loc[len(df)] = ([testUnits, testWins, testLoses,totalbets,winrate,testUnitsOvertime, testbanlist,keylist,betType,choice])
+        df = df.sort_values('units',ascending=False)
+        df = df.reset_index(drop=True)
+        return df
+    df = df.sort_values('units',ascending=False)
+    for i in range(len(df)):
+        if(df['units'][i] > testUnits):
+            #add to df
+            df.loc[len(df)] = ([testUnits, testWins, testLoses,totalbets,winrate,testUnitsOvertime, testbanlist,keylist,betType,choice])
+            #remove smallest unit row
+            df = df.sort_values('units',ascending=True)
+            df = df.drop(df.index[0])
+            df = df.sort_values('units',ascending=False)
+            df = df.reset_index(drop=True)
+            break
+    return df
