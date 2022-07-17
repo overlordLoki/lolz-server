@@ -7,7 +7,7 @@ def runSim(df ,choice,betType , keys):
     units, wins, loses, unitsOvertime , banList = sim.setDefults()
     #team ban list key
     banList = []
-    count = 0
+    count = 1
     if('banList' in keys):
         banList,count = bestBanList(df, choice, betType, keys)
     for i in range(len(df)):
@@ -17,7 +17,7 @@ def runSim(df ,choice,betType , keys):
             continue
         #check if no more units to bet
         if (units < 1):
-            return units , wins, loses,banList, unitsOvertime
+            return units , wins, loses,banList, unitsOvertime, count
         units, wins, loses, unitsOvertime = sim.doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i)
     return units , wins, loses,banList, unitsOvertime,count
 
@@ -79,3 +79,11 @@ def printSim(df, i):
     print(f'choice: {str(df["choice"][i])}')
     print(f'key set: {str(df["KeySet"][i])}')
     print(f'exclude list: {str(df["banList"][i])}')
+
+# df_testing = pd.read_sql_query('SELECT * FROM games WHERE tournamentID = 1', db.engine)
+# all_keys = ['banList','isFirstOfMatch','isLastOfMatch','isSecondOfMatch','isNotFirstOfMatch','AvgTotalKillsLessThan']
+# all_bet_types = ['kills','dragons','barons','tower','gameTime']
+# keys = []
+# betTypes = ['dragons']
+# df_top10, count = bestKeysSim(df_testing, keys,betTypes)
+# print(f'number of sims done: {str(count)}')

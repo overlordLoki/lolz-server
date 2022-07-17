@@ -87,11 +87,25 @@ def doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i):
     wins += outcome
     loses += 1 - outcome
     if(outcome == 1):
-        units += 0.83
+        units += getOdds(df, choice, num, betType)
     else:
         units -= 1
     unitsOvertime.append(units)
     return units, wins, loses, unitsOvertime
+
+#get the odds of the bet
+def getOdds(df, choice, num, betType):
+    if(betType == 'kills'):
+        return 0.83
+    if (betType == 'dragons'):
+        return 0.5 if (choice == 'over') else 1.9
+    if(betType == 'barons'):
+        return 0.5
+    if(betType == 'towers'):
+        return 0.83
+    if(betType == 'gameTime'):
+        return 0.83
+    return 0.83
 
 #function to decide the number the booky makes
 def decideNum(df, i, betType):
