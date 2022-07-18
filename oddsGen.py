@@ -42,6 +42,8 @@ def makequeryodds(df):
 # fuction to calculate the num for kills
 def killsNum(df):
     #get the teams playing
+    blueTeam = df.iloc[0]['Blue_team_Name']
+    redTeam = df.iloc[0]['Red_Team_Name']
 
     return 21.5
     
@@ -49,3 +51,7 @@ def killsNum(df):
 def killsOdds(df):
     #get the teams playing
     return 1.83
+
+#get the ranking of the team
+def getRanking(team):
+    return 0
