@@ -1,3 +1,4 @@
+import multiprocessing
 import database as db
 import pandas as pd
 import simFuctions as sim
@@ -19,7 +20,7 @@ def runSim(df ,choice,betType , keys):
         if (units < 1):
             return units , wins, loses,banList, unitsOvertime, count
         units, wins, loses, unitsOvertime = sim.doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i)
-    return units , wins, loses,banList, unitsOvertime,count
+    return units , wins, loses,banList, unitsOvertime,count #, keys
 
 #function to get the best key combinations
 def bestKeysSim(df_testing, keys, betTypes):
@@ -29,12 +30,24 @@ def bestKeysSim(df_testing, keys, betTypes):
     keysCombo = sim.makeCombonations(keys)
     for choice in ['under','over']:
         for betType in betTypes:
+            #muliprocessing of the sim with a pool of workers
+            with multiprocessing.Pool(processes=2) as pool:
+                results = [pool.apply_async(runSim, args=(df_testing, choice, betType, key)) for key in keysCombo]
+                pool.close()
+                pool.join()
+                for result in results:
+                    units, wins, loses, banList, unitsOvertime, count, keys = result.get()
+                    df_top10 = sim.checkIfHigher(df_top10, units, wins, loses,
+                                                banList, unitsOvertime, keys, betType, choice)
+
+
             for keylist in keysCombo:
-                df_top10, addCount = poolSim(df_testing, count, df_top10, choice, betType, keylist)
-                count += addCount
+                count += 1
+                testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType, keylist )
+                count += addToCount
+                df_top10 = sim.checkIfHigher(df_top10, testUnits, testWins, testLoses, testbanlist, testUnitsOvertime, keylist, betType, choice)
+                    
     return df_top10, count
-
-
 
 #keys functions
 
@@ -79,13 +92,6 @@ def printSim(df, i):
     print(f'key set: {str(df["KeySet"][i])}')
     print(f'exclude list: {str(df["banList"][i])}')
 
-def poolSim(df_testing, count, df_top10, choice, betType, keylist):
-    count += 1
-    testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType, keylist )
-    count += addToCount
-    sim.checkIfHigher(df_top10, testUnits, testWins, testLoses, testbanlist, testUnitsOvertime, keylist, betType, choice)
-    return df_top10 , count
-    
 # df_testing = pd.read_sql_query('SELECT * FROM games WHERE tournamentID = 1', db.engine)
 # all_keys = ['banList','isFirstOfMatch','isLastOfMatch','isSecondOfMatch','isNotFirstOfMatch','AvgTotalKillsLessThan']
 # all_bet_types = ['kills','dragons','barons','tower','gameTime']
@@ -93,3 +99,12 @@ def poolSim(df_testing, count, df_top10, choice, betType, keylist):
 # betTypes = ['dragons']
 # df_top10, count = bestKeysSim(df_testing, keys,betTypes)
 # print(f'number of sims done: {str(count)}')
+
+
+
+
+
+
+
+
+
