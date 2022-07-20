@@ -1,3 +1,4 @@
+from cgi import test
 import multiprocessing
 import database as db
 import pandas as pd
@@ -20,7 +21,7 @@ def runSim(df ,choice,betType , keys):
         if (units < 1):
             return units , wins, loses,banList, unitsOvertime, count
         units, wins, loses, unitsOvertime = sim.doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i)
-    return units , wins, loses,banList, unitsOvertime,count #, keys
+    return units , wins, loses,banList, unitsOvertime,count , keys
 
 #function to get the best key combinations
 def bestKeysSim(df_testing, keys, betTypes):
@@ -41,11 +42,11 @@ def bestKeysSim(df_testing, keys, betTypes):
                                                 banList, unitsOvertime, keys, betType, choice)
 
 
-            for keylist in keysCombo:
-                count += 1
-                testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType, keylist )
-                count += addToCount
-                df_top10 = sim.checkIfHigher(df_top10, testUnits, testWins, testLoses, testbanlist, testUnitsOvertime, keylist, betType, choice)
+            # for keylist in keysCombo:
+            #     count += 1
+            #     testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType, keylist )
+            #     count += addToCount
+            #     df_top10 = sim.checkIfHigher(df_top10, testUnits, testWins, testLoses, testbanlist, testUnitsOvertime, keylist, betType, choice)
                     
     return df_top10, count
 
@@ -92,13 +93,16 @@ def printSim(df, i):
     print(f'key set: {str(df["KeySet"][i])}')
     print(f'exclude list: {str(df["banList"][i])}')
 
-# df_testing = pd.read_sql_query('SELECT * FROM games WHERE tournamentID = 1', db.engine)
-# all_keys = ['banList','isFirstOfMatch','isLastOfMatch','isSecondOfMatch','isNotFirstOfMatch','AvgTotalKillsLessThan']
-# all_bet_types = ['kills','dragons','barons','tower','gameTime']
-# keys = []
-# betTypes = ['dragons']
-# df_top10, count = bestKeysSim(df_testing, keys,betTypes)
-# print(f'number of sims done: {str(count)}')
+def testingR():
+    df_testing = pd.read_sql_query('SELECT * FROM games WHERE tournamentID = 1', db.engine)
+    all_keys = ['banList','isFirstOfMatch','isLastOfMatch','isSecondOfMatch','isNotFirstOfMatch','AvgTotalKillsLessThan']
+    all_bet_types = ['kills','dragons','barons','tower','gameTime']
+    keys = []
+    betTypes = ['kills']
+    df_top10_keys, count = bestKeysSim(df_testing, keys,betTypes)
+    count = count*2
+    print(f'number of sims done: {str(count)}')
+    return 1
 
 
 
