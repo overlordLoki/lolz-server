@@ -5,3 +5,6 @@ TODO:
     multiprocessing simulations for faster performance
     elo ranking system for ranking teams to get better odds
     fix combo algorithm to half run time cost
+    ML for making odds and predicting outcomes
+
+    move combo algorithm to run less often

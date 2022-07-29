@@ -62,8 +62,7 @@ def setDefults():
     wins = 0
     loses = 0     
     unitsOvertime = [units]
-    banList = []
-    return units,wins,loses,unitsOvertime, banList
+    return units,wins,loses,unitsOvertime
 
 # fuction to do the bet
 def makeBet(i, df, choice, num, betType):
@@ -96,15 +95,15 @@ def doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i):
 #get the odds of the bet
 def getOdds(df, choice, num, betType):
     if(betType == 'kills'):
-        return 0.83
+        return 0.83 #this is a fixed number
     if (betType == 'dragons'):
-        return 0.5 if (choice == 'over') else 1.9
+        return 0.5 if (choice == 'over') else 1.9 #needs to be calculated
     if(betType == 'barons'):
-        return 0.5
+        return 0.5 #needs to be calculated
     if(betType == 'towers'):
-        return 0.83
+        return 0.83 #this is a fixed number
     if(betType == 'gameTime'):
-        return 0.83
+        return 0.83 #this is a fixed number
     return 0.83
 
 #function to decide the number the booky makes
@@ -126,11 +125,11 @@ def decideNum(df, i, betType):
     if (betType == 'dragons'):
         return 4.5
     if betType == 'barons':
-        return 1.5
+        return 1.5 
     if betType == 'towers':
-        return 11.5
+        return 11.5 
     if betType == 'gameTime':
-        return 32.30
+        return 32.30 #needs to be calculated
     return 32.30
 
 #if units is higher add to df, remove smallest unit row
