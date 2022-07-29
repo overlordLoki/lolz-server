@@ -21,7 +21,7 @@ def runSim(df ,choice,betType , keys):
         if (units < 1):
             return units , wins, loses,banList, unitsOvertime, count
         units, wins, loses, unitsOvertime = sim.doTheBet(df, choice, num, betType, units, wins, loses, unitsOvertime, i)
-    return units , wins, loses,banList, unitsOvertime,count , keys
+    return units , wins, loses,banList, unitsOvertime,count
 
 #function to get the best key combinations
 def bestKeysSim(df_testing, keys, betTypes):
@@ -32,21 +32,21 @@ def bestKeysSim(df_testing, keys, betTypes):
     for choice in ['under','over']:
         for betType in betTypes:
             #muliprocessing of the sim with a pool of workers
-            with multiprocessing.Pool(processes=2) as pool:
-                results = [pool.apply_async(runSim, args=(df_testing, choice, betType, key)) for key in keysCombo]
-                pool.close()
-                pool.join()
-                for result in results:
-                    units, wins, loses, banList, unitsOvertime, count, keys = result.get()
-                    df_top10 = sim.checkIfHigher(df_top10, units, wins, loses,
-                                                banList, unitsOvertime, keys, betType, choice)
+            # with multiprocessing.Pool(processes=2) as pool:
+            #     results = [pool.apply_async(runSim, args=(df_testing, choice, betType, key)) for key in keysCombo]
+            #     pool.close()
+            #     pool.join()
+            #     for result in results:
+            #         units, wins, loses, banList, unitsOvertime, count, keys = result.get()
+            #         df_top10 = sim.checkIfHigher(df_top10, units, wins, loses,
+            #                                     banList, unitsOvertime, keys, betType, choice)
 
 
-            # for keylist in keysCombo:
-            #     count += 1
-            #     testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType, keylist )
-            #     count += addToCount
-            #     df_top10 = sim.checkIfHigher(df_top10, testUnits, testWins, testLoses, testbanlist, testUnitsOvertime, keylist, betType, choice)
+            for keylist in keysCombo:
+                count += 1
+                testUnits , testWins, testLoses, testbanlist, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType, keylist )
+                count += addToCount
+                df_top10 = sim.checkIfHigher(df_top10, testUnits, testWins, testLoses, testbanlist, testUnitsOvertime, keylist, betType, choice)
                     
     return df_top10, count
 
