@@ -24,6 +24,7 @@ def bestKeysSim(df_testing, keys, betTypes):
     df_top10 = pd.DataFrame(columns=['units','wins','loses','totalbets','winrate',
                                      'unitsovertime','banList','KeySet','betType','choice'])
     keysCombo = sim.makeCombonations(keys)
+    banList = []
     for choice in ['under','over']:
         for betType in betTypes:
             for keylist in keysCombo:
