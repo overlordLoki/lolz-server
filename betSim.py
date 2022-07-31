@@ -27,7 +27,8 @@ def bestKeysSim(df_testing, keys, betTypes):
     for choice in ['under','over']:
         for betType in betTypes:
             for keylist in keysCombo:
-                banList = bs.bestBanList(df_testing, choice, betType, keylist)
+                if 'banList' in keylist:
+                    banList = bs.bestBanList(df_testing, choice, betType, keylist)
                 count += 1
                 testUnits , testWins, testLoses, testUnitsOvertime,addToCount = runSim(df_testing, choice, betType,banList, keylist )
                 count += addToCount
