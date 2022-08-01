@@ -1,5 +1,3 @@
-from ast import If
-from calendar import c
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
