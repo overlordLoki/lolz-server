@@ -6,7 +6,8 @@ import mysql.connector as mysql
 import passwords as pw
 
 password = pw.getLogin()
-db = mysql.connect(host='140.238.205.186', user='loki', passwd=password, database='lolz')
+ip = pw.getIP()
+db = mysql.connect(host= ip, user='loki', passwd=password, database='lolz')
 mycursor = db.cursor()
 engine = sql.create_engine(
     'mysql+mysqlconnector://loki:Thethethe3!@140.238.205.186/lolz',
