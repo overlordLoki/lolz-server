@@ -10,8 +10,8 @@ ip = pw.getIP()
 db = mysql.connect(host= ip, user='loki', passwd=password, database='lolz')
 mycursor = db.cursor()
 engine = sql.create_engine(
-    'mysql+mysqlconnector://loki:Thethethe3!@140.238.205.186/lolz',
-    connect_args= dict(host='140.238.205.186', port=3306))
+    'mysql+mysqlconnector://loki:'+password+'@'+ip+'/lolz',
+    connect_args= dict(host= ip, port=3306))
 
 #get the table from the database
 def getTable(tournament):
